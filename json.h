@@ -1,5 +1,3 @@
-#ifndef _JSON_H
-#define _JSON_H
 
 /* vim: set et ts=3 sw=3 ft=c:
  *
@@ -29,6 +27,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+#ifndef _JSON_H
+#define _JSON_H
 
 #ifndef json_char
    #define json_char char
@@ -142,3 +143,5 @@ json_value * json_parse_ex
 void json_value_free (json_value *);
 
 #endif  // _JSON_H
+
+

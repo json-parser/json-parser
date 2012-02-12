@@ -1,4 +1,3 @@
-
 /* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin.  All rights reserved.
@@ -55,7 +54,7 @@ static const unsigned char hex_table [] =
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 
 };
 
-static unsigned char hex_value (json_char c)
+static unsigned char hex_value (json_uchar c)
 {
    return c > 127 ? 0xFF : hex_table [c];
 }

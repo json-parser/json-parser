@@ -142,6 +142,6 @@ json_value * json_parse_ex
 
 void json_value_free (json_value *);
 
-#endif  // _JSON_H
+#endif
 
 

@@ -113,21 +113,34 @@ typedef struct _json_value
 
       public:
 
-         inline struct _json_value &operator [] (int index)
+         const static _json_value _none;
+
+         inline _json_value ()
+         {  memset (this, 0, sizeof (_json_value));
+         }
+
+         inline const struct _json_value &operator [] (int index) const
          {
+            if (type != json_array || index < 0 || index > u.array.length)
+               return _json_value::_none;
+
             return *u.array.values [index];
          }
 
-         inline struct _json_value &operator [] (const char * index)
+         inline const struct _json_value &operator [] (const char * index) const
          { 
+            if (type != json_object)
+               return _json_value::_none;
+
             for (int i = 0; i < u.object.length; ++ i)
                if (!strcmp (u.object.values [i].name, index))
                   return *u.object.values [i].value;
+
+            return _json_value::_none;
          }
 
          inline operator const char * ()
-         { 
-            return u.string.ptr;
+         {  return u.string.ptr;
          }
 
    #endif

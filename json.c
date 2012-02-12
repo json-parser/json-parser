@@ -47,10 +47,10 @@ typedef unsigned short json_uchar;
 
 static unsigned char hex_value (json_char c)
 {
-  if (c >= 48 && c <= 57)  return c - 48;
-  if (c >= 65 && c <= 70)  return c - 55;
-  if (c >= 97 && c <= 102) return c - 87;
-  return -1;
+   if (c >= 48 && c <= 57)  return c - 48;
+   if (c >= 65 && c <= 70)  return c - 55;
+   if (c >= 97 && c <= 102) return c - 87;
+   return 0xFF;
 }
 
 typedef struct

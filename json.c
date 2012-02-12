@@ -134,6 +134,7 @@ static int new_value
             }
 
             break;
+         default: break;
       };
 
       value->u.array.length = 0;
@@ -184,7 +185,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_state state;
    int flags;
 
-   *error = 0;
+   error[0] = '\0';
 
    memset (&state, 0, sizeof (json_state));
    memcpy (&state.settings, settings, sizeof (json_settings));
@@ -231,7 +232,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                     if ((uc_b1 = hex_value (*++ i)) == 0xFF || (uc_b2 = hex_value (*++ i)) == 0xFF
                           || (uc_b3 = hex_value (*++ i)) == 0xFF || (uc_b4 = hex_value (*++ i)) == 0xFF)
                     {
-                        sprintf (error, "Invalid character value (at %d:%d)", b, cur_line, e_off);
+                        sprintf (error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
                         goto e_failed;
                     }
 
@@ -312,6 +313,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
                      flags |= flag_seek_value | flag_need_colon;
                      continue;
+                  default: break;
                };
             }
             else
@@ -552,6 +554,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
             flags |= flag_next | flag_reproc;
             break;
+         default: break;
          };
 
          if (flags & flag_reproc)
@@ -589,6 +592,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            [parent->u.array.length] = top;
 
                      break;
+                  default: break;
                };
             }
 
@@ -616,8 +620,7 @@ e_alloc_failure:
 
 e_failed:
 
-   if (error)
-      strcpy (error_buf, *error ? error : "Unknown error");
+   strcpy (error_buf, *error ? error : "Unknown error");
 
    if (state.first_pass)
       alloc = root;
@@ -682,6 +685,8 @@ void json_value_free (json_value * value)
 
             free (value->u.string.ptr);
             break;
+
+         default: break;
       };
 
       cur_value = value;

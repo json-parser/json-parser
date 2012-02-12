@@ -1,3 +1,5 @@
+#ifndef _JSON_H
+#define _JSON_H
 
 /* vim: set et ts=3 sw=3 ft=c:
  *
@@ -139,4 +141,4 @@ json_value * json_parse_ex
 
 void json_value_free (json_value *);
 
-
+#endif  // _JSON_H

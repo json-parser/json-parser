@@ -1,7 +1,7 @@
 
 /* vim: set et ts=3 sw=3 ft=c:
  *
- * Copyright (C) 2012 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
  * https://github.com/udp/json-parser
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,14 +42,17 @@
 
 typedef unsigned short json_uchar;
 
-#define numeric(b) \
-   ((b) >= '0' && (b) <= '9')
-
 static unsigned char hex_value (json_char c)
 {
-   if (c >= 48 && c <= 57)  return c - 48;
-   if (c >= 65 && c <= 70)  return c - 55;
-   if (c >= 97 && c <= 102) return c - 87;
+   if (c >= 'A' && c <= 'Z')
+      return c - 'A';
+
+   if (c >= 'a' && c <= 'z')
+      return c - 'a';
+
+   if (c >= '0' && c <= '9')
+      return c - '0';
+
    return 0xFF;
 }
 
@@ -127,7 +130,9 @@ static int new_value
             }
 
             break;
-         default: break;
+
+         default:
+            break;
       };
 
       value->u.array.length = 0;
@@ -306,7 +311,9 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
                      flags |= flag_seek_value | flag_need_colon;
                      continue;
-                  default: break;
+
+                  default:
+                     break;
                };
             }
             else
@@ -429,7 +436,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
                      default:
 
-                        if (numeric (b) || b == '-')
+                        if (isdigit (b) || b == '-')
                         {
                            if (!new_value (&state, &top, &root, &alloc, json_integer))
                               goto e_alloc_failure;
@@ -512,7 +519,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
          case json_integer:
 
-            if (numeric (b))
+            if (isdigit (b))
                break;
 
             if (b == '.')
@@ -542,12 +549,14 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                break;
             }
 
-            if (numeric (b))
+            if (isdigit (b))
                break;
 
             flags |= flag_next | flag_reproc;
             break;
-         default: break;
+
+         default:
+            break;
          };
 
          if (flags & flag_reproc)
@@ -585,7 +594,9 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            [parent->u.array.length] = top;
 
                      break;
-                  default: break;
+
+                  default:
+                     break;
                };
             }
 
@@ -679,7 +690,8 @@ void json_value_free (json_value * value)
             free (value->u.string.ptr);
             break;
 
-         default: break;
+         default:
+            break;
       };
 
       cur_value = value;

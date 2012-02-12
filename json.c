@@ -45,10 +45,10 @@ typedef unsigned short json_uchar;
 static unsigned char hex_value (json_char c)
 {
    if (c >= 'A' && c <= 'Z')
-      return c - 'A';
+      return (c - 'A') + 10;
 
    if (c >= 'a' && c <= 'z')
-      return c - 'a';
+      return (c - 'a') + 10;
 
    if (c >= '0' && c <= '9')
       return c - '0';

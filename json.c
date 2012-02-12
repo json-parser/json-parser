@@ -103,8 +103,11 @@ static int new_value
       {
          case json_array:
 
-            value->u.array.values = (json_value **) json_alloc
-               (state, value->u.array.length * sizeof (json_value *), 0);
+            if (! (value->u.array.values = (json_value **) json_alloc
+               (state, value->u.array.length * sizeof (json_value *), 0)) )
+            {
+               return 0;
+            }
 
             break;
 
@@ -112,8 +115,11 @@ static int new_value
 
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
-            (*(void **) &value->u.object.values) = json_alloc
-                  (state, values_size + ((unsigned long) value->u.object.values), 0);
+            if (! ((*(void **) &value->u.object.values) = json_alloc
+                  (state, values_size + ((unsigned long) value->u.object.values), 0)) )
+            {
+               return 0;
+            }
 
             value->_reserved.object_mem = (*(char **) &value->u.object.values) + values_size;
 
@@ -121,8 +127,11 @@ static int new_value
 
          case json_string:
 
-            value->u.string.ptr = (json_char *) json_alloc
-               (state, (value->u.string.length + 1) * sizeof (json_char), 0);
+            if (! (value->u.string.ptr = (json_char *) json_alloc
+               (state, (value->u.string.length + 1) * sizeof (json_char), 0)) )
+            {
+               return 0;
+            }
 
             break;
       };

@@ -59,9 +59,12 @@ static unsigned char hex_value (json_char c)
 typedef struct
 {
    json_settings settings;
+   int first_pass;
 
    unsigned long used_memory;
-   int first_pass;
+
+   unsigned int uint_max;
+   unsigned long ulong_max;
 
 } json_state;
 
@@ -69,8 +72,11 @@ static void * json_alloc (json_state * state, unsigned long size, int zero)
 {
    void * mem;
 
-   if (state->settings.max_memory &&
-         (state->used_memory += size) > state->settings.max_memory)
+   if ((state->ulong_max - state->used_memory) < size)
+      return 0;
+
+   if (state->settings.max_memory
+         && (state->used_memory += size) > state->settings.max_memory)
    {
       return 0;
    }
@@ -183,19 +189,23 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_state state;
    int flags;
 
+   memset (&state.uint_max, 0xFF, sizeof (state.uint_max));
+   memset (&state.ulong_max, 0xFF, sizeof (state.ulong_max));
+
+   state.uint_max -= 8; /* limit of how much can be added before next check */
+   state.ulong_max -= 8;
+
    error[0] = '\0';
 
    memset (&state, 0, sizeof (json_state));
    memcpy (&state.settings, settings, sizeof (json_settings));
 
-   state.first_pass = 1;
-
-   for (; state.first_pass >= 0; -- state.first_pass)
+   for (state.first_pass = 1; state.first_pass >= 0; -- state.first_pass)
    {
       json_uchar uchar;
       unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
       json_char * string;
-      int string_length;
+      unsigned int string_length;
 
       top = root = 0;
       flags = flag_seek_value;
@@ -213,6 +223,9 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             {  sprintf (error, "Unexpected EOF in string (at %d:%d)", cur_line, e_off);
                goto e_failed;
             }
+
+            if (string_length > state.uint_max)
+               goto e_overflow;
 
             if (flags & flag_escaped)
             {
@@ -600,7 +613,9 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                };
             }
 
-            ++ top->parent->u.array.length;
+            if ( (++ top->parent->u.array.length) > state.uint_max)
+               goto e_overflow;
+
             top = top->parent;
 
             continue;
@@ -620,6 +635,11 @@ e_unknown_value:
 e_alloc_failure:
 
    strcpy (error, "Memory allocation failure");
+   goto e_failed;
+
+e_overflow:
+
+   sprintf (error, "%d:%d: Too long (caught overflow)", cur_line, e_off);
    goto e_failed;
 
 e_failed:

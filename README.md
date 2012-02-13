@@ -1,11 +1,11 @@
-
 Very low footprint JSON parser written in portable ANSI C.
 
 * BSD licensed with no dependencies (i.e. just drop the C file into your project)
 * Never recurses or allocates more memory than it needs
-* Very simple API
+* Very simple API with operator sugar for C++
 
-Functions:
+API
+---
 
     json_value * json_parse
         (const json_char * json);
@@ -25,5 +25,3 @@ The `type` field of `json_value` is one of:
 * `json_string` (see `u.string.ptr`, `u.string.length`)
 * `json_boolean` (see `u.boolean`)
 * `json_null`
-
-

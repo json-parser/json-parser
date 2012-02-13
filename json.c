@@ -480,7 +480,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             };
          }
 
-         if (flags & flag_skip)
+         if ((!top) || flags & flag_skip)
          {
             flags &= ~ flag_skip;
             continue;

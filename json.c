@@ -178,7 +178,8 @@ static int new_value
 
 const static int
    flag_next = 1, flag_reproc = 2, flag_need_comma = 4, flag_seek_value = 8, flag_exponent = 16,
-   flag_got_exponent_sign = 32, flag_escaped = 64, flag_string = 128, flag_need_colon = 256;
+   flag_got_exponent_sign = 32, flag_escaped = 64, flag_string = 128, flag_need_colon = 256,
+   flag_done = 512;
 
 json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
 {
@@ -216,6 +217,22 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
       for (i = json ;; ++ i)
       {
          json_char b = *i;
+
+         if (flags & flag_done)
+         {
+            if (!b)
+               break;
+
+            switch (b)
+            {
+               whitespace:
+                  continue;
+
+               default:
+                  sprintf (error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
+                  goto e_failed;
+            };
+         }
 
          if (flags & flag_string)
          {
@@ -573,7 +590,12 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             flags = (flags & ~ flag_next) | flag_need_comma;
 
             if (!top->parent)
-               break; /* root value done */
+            {
+               /* root value done */
+
+               flags |= flag_done;
+               continue;
+            }
 
             if (top->parent->type == json_array)
                flags |= flag_seek_value;

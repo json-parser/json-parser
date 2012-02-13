@@ -177,9 +177,8 @@ static int new_value
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
 const static int
-   flag_next = 1, flag_reproc = 2, flag_need_comma = 8, flag_seek_value = 16,
-   flag_skip = 32, flag_exponent = 64, flag_got_exponent_sign = 128, flag_escaped = 256,
-   flag_string = 512, flag_need_colon = 1024;
+   flag_next = 1, flag_reproc = 2, flag_need_comma = 4, flag_seek_value = 8, flag_exponent = 16,
+   flag_got_exponent_sign = 32, flag_escaped = 64, flag_string = 128, flag_need_colon = 256;
 
 json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
 {
@@ -360,8 +359,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                   if (flags & flag_need_comma)
                   {
                      if (b == ',')
-                     {  flags = (flags & ~ flag_need_comma) | flag_skip;
-                        break;
+                     {  flags &= ~ flag_need_comma;
+                        continue;
                      }
                      else
                      {  sprintf (error, "%d:%d: Expected , before %c", cur_line, e_off, b);
@@ -372,8 +371,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                   if (flags & flag_need_colon)
                   {
                      if (b == ':')
-                     {  flags = (flags & ~ flag_need_colon) | flag_skip;
-                        break;
+                     {  flags &= ~ flag_need_colon;
+                        continue;
                      }
                      else
                      {  sprintf (error, "%d:%d: Expected : before %c", cur_line, e_off, b);
@@ -390,28 +389,27 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                         if (!new_value (&state, &top, &root, &alloc, json_object))
                            goto e_alloc_failure;
 
-                        flags |= flag_skip;
-                        break;
+                        continue;
 
                      case '[':
 
                         if (!new_value (&state, &top, &root, &alloc, json_array))
                            goto e_alloc_failure;
 
-                        flags |= flag_skip | flag_seek_value;
-                        break;
+                        flags |= flag_seek_value;
+                        continue;
 
                      case '"':
 
                         if (!new_value (&state, &top, &root, &alloc, json_string))
                            goto e_alloc_failure;
 
-                        flags |= flag_skip | flag_string;
+                        flags |= flag_string;
 
                         string = top->u.string.ptr;
                         string_length = 0;
 
-                        break;
+                        continue;
 
                      case 't':
 
@@ -458,12 +456,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            flags &= ~ flag_exponent | flag_got_exponent_sign;
 
                            if (state.first_pass)
-                           {
-                              if (b == '-')
-                                 flags |= flag_skip;
-
-                              break;
-                           }
+                              continue;
 
                            if (top->type == json_double)
                               top->u.dbl = strtod (i, (json_char **) &i);
@@ -479,105 +472,95 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                   };
             };
          }
-
-         if ((!top) || flags & flag_skip)
+         else
          {
-            flags &= ~ flag_skip;
-            continue;
-         }
-
-         switch (top->type)
-         {
-         case json_object:
-            
-            switch (b)
+            switch (top->type)
             {
-               whitespace:
+            case json_object:
+               
+               switch (b)
+               {
+                  whitespace:
+                     continue;
+
+                  case '"':
+
+                     if (flags & flag_need_comma)
+                     {
+                        sprintf (error, "%d:%d: Expected , before \"", cur_line, e_off);
+                        goto e_failed;
+                     }
+
+                     flags |= flag_string;
+
+                     string = (json_char *) top->_reserved.object_mem;
+                     string_length = 0;
+
+                     break;
+                  
+                  case '}':
+
+                     flags = (flags & ~ flag_need_comma) | flag_next;
+                     break;
+
+                  case ',':
+
+                     if (flags & flag_need_comma)
+                     {
+                        flags &= ~ flag_need_comma;
+                        break;
+                     }
+
+                  default:
+
+                     sprintf (error, "%d:%d: Unexpected `%c` in object", cur_line, e_off, b);
+                     goto e_failed;
+               };
+
+               break;
+
+            case json_integer:
+
+               if (isdigit (b))
                   continue;
 
-               case '"':
+               if (b == '.')
+               {
+                  top->type = json_double;
+                  break;
+               }
 
-                  if (flags & flag_need_comma)
-                  {
-                     sprintf (error, "%d:%d: Expected , before \"", cur_line, e_off);
-                     goto e_failed;
-                  }
+               flags |= flag_next | flag_reproc;
+               break;
 
-                  flags |= flag_string;
+            case json_double:
 
-                  string = (json_char *) top->_reserved.object_mem;
-                  string_length = 0;
+               if (b == 'e' || b == 'E')
+               {
+                  flags |= flags & flag_exponent
+                     ? (flag_next | flag_reproc) : flag_exponent;
 
                   break;
-               
-               case '}':
+               }
 
-                  flags = (flags & ~ flag_need_comma) | flag_next;
+               if (b == '+' || b == '-')
+               {
+                  flags |= flags & flag_got_exponent_sign
+                     ? (flag_next | flag_reproc) : flag_got_exponent_sign;
+
+                  break;
+               }
+
+               if (isdigit (b))
                   break;
 
-               case ',':
+               flags |= flag_next | flag_reproc;
+               break;
 
-                  if (flags & flag_need_comma)
-                  {
-                     flags &= ~ flag_need_comma;
-                     break;
-                  }
-
-               default:
-
-                  sprintf (error, "%d:%d: Unexpected `%c` in object", cur_line, e_off, b);
-                  goto e_failed;
+            default:
+               break;
             };
-
-            break;
-
-         case json_integer:
-
-            if (!state.first_pass)
-               break;
-
-            if (isdigit (b))
-               continue;
-
-            if (b == '.')
-            {
-               top->type = json_double;
-               break;
-            }
-
-            flags |= flag_next | flag_reproc;
-            break;
-
-         case json_double:
-
-            if (!state.first_pass)
-               break;
-
-            if (b == 'e' || b == 'E')
-            {
-               flags |= flags & flag_exponent
-                  ? (flag_next | flag_reproc) : flag_exponent;
-
-               break;
-            }
-
-            if (b == '+' || b == '-')
-            {
-               flags |= flags & flag_got_exponent_sign
-                  ? (flag_next | flag_reproc) : flag_got_exponent_sign;
-
-               break;
-            }
-
-            if (isdigit (b))
-               break;
-
-            flags |= flag_next | flag_reproc;
-            break;
-
-         default:
-            break;
-         };
+         }
 
          if (flags & flag_reproc)
          {

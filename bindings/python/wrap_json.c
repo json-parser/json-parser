@@ -42,10 +42,11 @@ PyObject * convert_value(json_value * data)
         case json_object:
             value = PyDict_New();
             for (int i = 0; i < data->u.object.length; i++) {
-                char * name = data->u.object.values[i].name;
+                PyObject * name = PyUnicode_FromString(
+                    data->u.object.values[i].name);
                 PyObject * object_value = convert_value(
                     data->u.object.values[i].value);
-                PyDict_SetItemString(value, name, object_value);
+                PyDict_SetItem(value, name, object_value);
             }
             break;
         case json_array:
@@ -63,7 +64,7 @@ PyObject * convert_value(json_value * data)
             value = PyFloat_FromDouble(data->u.dbl);
             break;
         case json_string:
-            value = PyString_FromStringAndSize(data->u.string.ptr, 
+            value = PyUnicode_FromStringAndSize(data->u.string.ptr, 
                 data->u.string.length);
             break;
         case json_boolean:
@@ -82,7 +83,7 @@ PyObject * decode_json(char * data)
 {
     json_settings settings;
     memset(&settings, 0, sizeof (json_settings)); 
-    char error [256];
+    char error[256];
     json_value * value = json_parse_ex(&settings, data, error);
     if (value == 0) {
         return PyErr_Format(json_exception, error);

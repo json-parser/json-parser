@@ -342,7 +342,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             switch (b)
             {
                whitespace:
-                  break; 
+                  continue;
 
                case ']':
 
@@ -493,7 +493,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             switch (b)
             {
                whitespace:
-                  break;
+                  continue;
 
                case '"':
 
@@ -534,7 +534,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
          case json_integer:
 
             if (isdigit (b))
-               break;
+               continue;
 
             if (b == '.')
             {

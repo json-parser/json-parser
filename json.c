@@ -645,7 +645,8 @@ e_overflow:
 
 e_failed:
 
-   strcpy (error_buf, *error ? error : "Unknown error");
+   if (error_buf)
+      strcpy (error_buf, *error ? error : "Unknown error");
 
    if (state.first_pass)
       alloc = root;

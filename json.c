@@ -657,7 +657,12 @@ e_overflow:
 e_failed:
 
    if (error_buf)
-      strcpy (error_buf, *error ? error : "Unknown error");
+   {
+      if (*error)
+         strcpy (error_buf, error);
+      else
+         strcpy (error_buf, "Unknown error");
+   }
 
    if (state.first_pass)
       alloc = root;

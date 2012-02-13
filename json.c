@@ -651,8 +651,6 @@ e_overflow:
 
 e_failed:
 
-   printf ("Was on pass %d\n", state.first_pass);
-
    if (error_buf)
       strcpy (error_buf, *error ? error : "Unknown error");
 

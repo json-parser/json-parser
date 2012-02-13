@@ -190,16 +190,16 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_state state;
    int flags;
 
+   error[0] = '\0';
+
+   memset (&state, 0, sizeof (json_state));
+   memcpy (&state.settings, settings, sizeof (json_settings));
+
    memset (&state.uint_max, 0xFF, sizeof (state.uint_max));
    memset (&state.ulong_max, 0xFF, sizeof (state.ulong_max));
 
    state.uint_max -= 8; /* limit of how much can be added before next check */
    state.ulong_max -= 8;
-
-   error[0] = '\0';
-
-   memset (&state, 0, sizeof (json_state));
-   memcpy (&state.settings, settings, sizeof (json_settings));
 
    for (state.first_pass = 1; state.first_pass >= 0; -- state.first_pass)
    {

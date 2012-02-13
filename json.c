@@ -533,6 +533,9 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
          case json_integer:
 
+            if (!state.first_pass)
+               break;
+
             if (isdigit (b))
                continue;
 
@@ -546,6 +549,9 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             break;
 
          case json_double:
+
+            if (!state.first_pass)
+               break;
 
             if (b == 'e' || b == 'E')
             {
@@ -644,6 +650,8 @@ e_overflow:
    goto e_failed;
 
 e_failed:
+
+   printf ("Was on pass %d\n", state.first_pass);
 
    if (error_buf)
       strcpy (error_buf, *error ? error : "Unknown error");

@@ -13,8 +13,8 @@ for i, test in enumerate(
 
     try:
         reencoded = jsonparser.decode(json.dumps(test))
-    except jsonparser.JSONException as (errno, strerror):
-        print 'valid/%d : Failed with error: %s' % (strerror)
+    except jsonparser.JSONException as error:
+        print 'valid/%d : Failed with error: %s' % error
         continue
 
     if reencoded != test:

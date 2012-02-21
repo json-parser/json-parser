@@ -36,6 +36,10 @@
    #endif
 #endif
 
+#ifdef __cplusplus
+   const _json_value _json_value::_none;
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

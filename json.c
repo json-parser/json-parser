@@ -36,9 +36,7 @@
    #endif
 #endif
 
-#ifdef __cplusplus
-   const _json_value _json_value::_none;
-#endif
+const struct _json_value json_value_none = { 0 };
 
 #include <stdlib.h>
 #include <stdio.h>

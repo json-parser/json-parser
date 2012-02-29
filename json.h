@@ -36,7 +36,12 @@
 #endif
 
 #ifdef __cplusplus
+
    #include <string.h>
+
+   extern "C"
+   {
+
 #endif
 
 typedef struct
@@ -57,6 +62,8 @@ typedef enum
    json_null
 
 } json_type;
+
+extern const struct _json_value json_value_none;
 
 typedef struct _json_value
 {
@@ -113,16 +120,17 @@ typedef struct _json_value
 
       public:
 
-         const static _json_value _none;
-
          inline _json_value ()
          {  memset (this, 0, sizeof (_json_value));
          }
 
          inline const struct _json_value &operator [] (int index) const
          {
-            if (type != json_array || index < 0 || index > u.array.length)
-               return _json_value::_none;
+            if (type != json_array || index < 0
+                     || ((unsigned int) index) > u.array.length)
+            {
+               return json_value_none;
+            }
 
             return *u.array.values [index];
          }
@@ -130,17 +138,33 @@ typedef struct _json_value
          inline const struct _json_value &operator [] (const char * index) const
          { 
             if (type != json_object)
-               return _json_value::_none;
+               return json_value_none;
 
-            for (int i = 0; i < u.object.length; ++ i)
+            for (unsigned int i = 0; i < u.object.length; ++ i)
                if (!strcmp (u.object.values [i].name, index))
                   return *u.object.values [i].value;
 
-            return _json_value::_none;
+            return json_value_none;
          }
 
-         inline operator const char * ()
-         {  return u.string.ptr;
+         inline operator const char * () const
+         {  
+            switch (type)
+            {
+               case json_string:
+                  return u.string.ptr;
+
+               default:
+                  return "";
+            };
+         }
+
+         inline operator long () const
+         {  return u.integer;
+         }
+
+         inline operator bool () const
+         {  return u.boolean != 0;
          }
 
    #endif
@@ -154,6 +178,11 @@ json_value * json_parse_ex
    (json_settings * settings, const json_char * json, char * error);
 
 void json_value_free (json_value *);
+
+
+#ifdef __cplusplus
+   } /* extern "C" */
+#endif
 
 #endif
 

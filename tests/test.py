@@ -14,13 +14,13 @@ for i, test in enumerate(
     try:
         reencoded = jsonparser.decode(json.dumps(test))
     except jsonparser.JSONException as error:
-        print 'valid/%d : Failed with error: %s' % error
+        print 'valid/%d : Failed with error: %s' % (i, error)
         continue
 
     if reencoded != test:
         print 'valid/%d : %s:\n\n%s\n\nbecame\n\n%s\n' % (i, failed, encoded, reencoded)
     else:
-        print 'valid/%d : %s' % (i, failed)
+        print 'valid/%d : %s' % (i, passed)
 
 for i, test in enumerate(
         map(lambda file: open(file).read(), glob.glob('invalid*.json'))):

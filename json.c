@@ -472,7 +472,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            if (!new_value (&state, &top, &root, &alloc, json_integer))
                               goto e_alloc_failure;
 
-                           flags &= ~ flag_exponent | flag_got_exponent_sign;
+                           flags &= ~ (flag_exponent | flag_got_exponent_sign);
 
                            if (state.first_pass)
                               continue;

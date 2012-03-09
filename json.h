@@ -47,8 +47,11 @@
 typedef struct
 {
    unsigned long max_memory;
+   int settings;
 
 } json_settings;
+
+const int json_relaxed_commas = 1;
 
 typedef enum
 {

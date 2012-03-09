@@ -36,7 +36,11 @@
    #endif
 #endif
 
-const struct _json_value json_value_none = { 0 };
+#ifdef __cplusplus
+   const struct _json_value json_value_none; /* zero-d by ctor */
+#else
+   const struct _json_value json_value_none = { 0 };
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -366,7 +370,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
                   if (top->type == json_array)
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                  else
+                  else if (!state.settings.settings & json_relaxed_commas)
                   {  sprintf (error, "%d:%d: Unexpected ]", cur_line, e_off);
                      goto e_failed;
                   }
@@ -504,7 +508,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
                   case '"':
 
-                     if (flags & flag_need_comma)
+                     if (flags & flag_need_comma && (!state.settings.settings & json_relaxed_commas))
                      {
                         sprintf (error, "%d:%d: Expected , before \"", cur_line, e_off);
                         goto e_failed;
@@ -539,39 +543,34 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                break;
 
             case json_integer:
+            case json_double:
 
                if (isdigit (b))
                   continue;
 
-               if (b == '.')
-               {
-                  top->type = json_double;
-                  break;
-               }
-
-               flags |= flag_next | flag_reproc;
-               break;
-
-            case json_double:
-
                if (b == 'e' || b == 'E')
                {
-                  flags |= flags & flag_exponent
-                     ? (flag_next | flag_reproc) : flag_exponent;
+                  if (!(flags & flag_exponent))
+                  {
+                     flags |= flag_exponent;
+                     top->type = json_double;
 
-                  break;
+                     continue;
+                  }
                }
-
-               if (b == '+' || b == '-')
+               else if (b == '+' || b == '-')
                {
-                  flags |= flags & flag_got_exponent_sign
-                     ? (flag_next | flag_reproc) : flag_got_exponent_sign;
-
-                  break;
+                  if (flags & flag_exponent && !(flags & flag_got_exponent_sign))
+                  {
+                     flags |= flag_got_exponent_sign;
+                     continue;
+                  }
                }
-
-               if (isdigit (b))
-                  break;
+               else if (b == '.' && top->type == json_integer)
+               {
+                  top->type = json_double;
+                  continue;
+               }
 
                flags |= flag_next | flag_reproc;
                break;

@@ -31,7 +31,7 @@
         "searchEngineListTemplate": "forSearchEnginesList.htm",
         "searchEngineFileTemplate": "forSearchEngines.htm",
         "searchEngineRobotsDb": "WEB-INF/robots.db",
- junk   "useDataStore": true,
+        "useDataStore": true,
         "dataStoreClass": "org.cofax.SqlDataStore",
         "redirectionClass": "org.cofax.SqlRedirection",
         "dataStoreName": "cofax",

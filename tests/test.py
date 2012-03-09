@@ -9,7 +9,7 @@ passed = "\033[92mPassed\033[0m"
 failed = "\033[91mFailed\033[0m"
 
 for i, test in enumerate(
-        map(lambda file: json.loads(open(file).read()), glob.glob('valid*.json'))):
+        map(lambda file: json.loads(open(file).read()), sorted(glob.glob('valid*.json')))):
 
     try:
         reencoded = jsonparser.decode(json.dumps(test))
@@ -23,7 +23,7 @@ for i, test in enumerate(
         print 'valid/%d : %s' % (i, passed)
 
 for i, test in enumerate(
-        map(lambda file: open(file).read(), glob.glob('invalid*.json'))):
+        map(lambda file: open(file).read(), sorted(glob.glob('invalid*.json')))):
 
     try:
         jsonparser.decode(test)

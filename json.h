@@ -51,7 +51,7 @@ typedef struct
 
 } json_settings;
 
-const int json_relaxed_commas = 1;
+extern const int json_relaxed_commas;
 
 typedef enum
 {

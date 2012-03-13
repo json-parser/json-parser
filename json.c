@@ -36,6 +36,8 @@
    #endif
 #endif
 
+const int json_relaxed_commas = 1;
+
 #ifdef __cplusplus
    const struct _json_value json_value_none; /* zero-d by ctor */
 #else

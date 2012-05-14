@@ -130,7 +130,7 @@ typedef struct _json_value
          inline const struct _json_value &operator [] (int index) const
          {
             if (type != json_array || index < 0
-                     || ((unsigned int) index) > u.array.length)
+                     || ((unsigned int) index) >= u.array.length)
             {
                return json_value_none;
             }

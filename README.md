@@ -4,6 +4,8 @@ Very low footprint JSON parser written in portable ANSI C.
 * Never recurses or allocates more memory than it needs
 * Very simple API with operator sugar for C++
 
+[![Build Status](https://secure.travis-ci.org/udp/json-parser.png)](http://travis-ci.org/udp/json-parser)
+
 API
 ---
 

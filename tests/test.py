@@ -18,7 +18,7 @@ for i, test in enumerate(
         continue
 
     if reencoded != test:
-        print 'valid/%d : %s:\n\n%s\n\nbecame\n\n%s\n' % (i, failed, encoded, reencoded)
+        print 'valid/%d : %s:\n\n%s\n\nbecame\n\n%s\n' % (i, failed, test, reencoded)
     else:
         print 'valid/%d : %s' % (i, passed)
 

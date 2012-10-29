@@ -184,11 +184,11 @@ static int new_value
 #define string_add(b)  \
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
-const static int
+const static long
    flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8, 
    flag_escaped = 16,  flag_string = 32,  flag_need_colon = 64,  flag_done = 128,
-   flag_num_negative = 256,  flag_num_e = 512,  flag_num_e_got_sign = 1024,
-   flag_num_e_negative = 2048;
+   flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,  
+   flag_num_e_got_sign = 2048,  flag_num_e_negative = 4096;
 
 json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
 {
@@ -197,7 +197,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    const json_char * cur_line_begin, * i;
    json_value * top, * root, * alloc = 0;
    json_state state;
-   int flags;
+   long flags;
    long num_digits, num_fraction, num_e;
 
    error[0] = '\0';
@@ -493,7 +493,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            }
 
                            flags &= ~ (flag_num_negative | flag_num_e |
-                                        flag_num_e_got_sign | flag_num_e_negative);
+                                        flag_num_e_got_sign | flag_num_e_negative |
+                                           flag_num_zero);
 
                            num_digits = 0;
                            num_fraction = 0;
@@ -569,16 +570,24 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                {
                   ++ num_digits;
 
-                  if (top->type == json_integer)
+                  if (top->type == json_integer || flags & flag_num_e)
                   {
-                     top->u.integer = (top->u.integer * 10) + (b - '0');
-                     continue;
-                  }
+                     if (flags & flag_num_zero)
+                     {  sprintf (error, "%d:%d: Unexpected `0` before `%c`", cur_line, e_off, b);
+                        goto e_failed;
+                     }
 
-                  if (flags & flag_num_e)
-                  {
-                     flags |= flag_num_e_got_sign;
-                     num_e = (num_e * 10) + (b - '0');
+                     if (num_digits == 1 && b == '0')
+                        flags |= flag_num_zero;
+
+                     if (flags & flag_num_e)
+                     {
+                        flags |= flag_num_e_got_sign;
+                        num_e = (num_e * 10) + (b - '0');
+                        continue;
+                     }
+
+                     top->u.integer = (top->u.integer * 10) + (b - '0');
                      continue;
                   }
 
@@ -622,8 +631,6 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      }
 
                      top->u.dbl += ((double) num_fraction) / (pow (10, num_digits));
-
-                     num_digits = 0;
                   }
 
                   if (b == 'e' || b == 'E')
@@ -637,6 +644,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      }
 
                      num_digits = 0;
+                     flags &= ~ flag_num_zero;
 
                      continue;
                   }

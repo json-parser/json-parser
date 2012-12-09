@@ -572,15 +572,17 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
                   if (top->type == json_integer || flags & flag_num_e)
                   {
-                     if (flags & flag_num_zero)
-                     {  sprintf (error, "%d:%d: Unexpected `0` before `%c`", cur_line, e_off, b);
-                        goto e_failed;
+                     if (! (flags & flag_num_e))
+                     {
+                        if (flags & flag_num_zero)
+                        {  sprintf (error, "%d:%d: Unexpected `0` before `%c`", cur_line, e_off, b);
+                           goto e_failed;
+                        }
+
+                        if (num_digits == 1 && b == '0')
+                           flags |= flag_num_zero;
                      }
-
-                     if (num_digits == 1 && b == '0')
-                        flags |= flag_num_zero;
-
-                     if (flags & flag_num_e)
+                     else
                      {
                         flags |= flag_num_e_got_sign;
                         num_e = (num_e * 10) + (b - '0');

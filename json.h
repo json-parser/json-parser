@@ -163,11 +163,41 @@ typedef struct _json_value
          }
 
          inline operator long () const
-         {  return u.integer;
+         {  
+            switch (type)
+            {
+               case json_integer:
+                  return u.integer;
+
+               case json_double:
+                  return (long) u.dbl;
+
+               default:
+                  return 0;
+            };
          }
 
          inline operator bool () const
-         {  return u.boolean != 0;
+         {  
+            if (type != json_boolean)
+               return false;
+
+            return u.boolean != 0;
+         }
+
+         inline operator double () const
+         {  
+            switch (type)
+            {
+               case json_integer:
+                  return u.integer;
+
+               case json_double:
+                  return u.dbl;
+
+               default:
+                  return 0;
+            };
          }
 
    #endif

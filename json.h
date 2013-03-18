@@ -35,6 +35,15 @@
    #define json_char char
 #endif
 
+#ifndef json_int_t
+   #ifndef _WIN32
+      #include <inttypes.h>
+      #define json_int_t int64_t
+   #else
+      #define json_int_t __int64
+   #endif
+#endif
+
 #ifdef __cplusplus
 
    #include <string.h>
@@ -77,7 +86,7 @@ typedef struct _json_value
    union
    {
       int boolean;
-      long integer;
+      json_int_t integer;
       double dbl;
 
       struct

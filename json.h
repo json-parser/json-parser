@@ -171,7 +171,7 @@ typedef struct _json_value
             };
          }
 
-         inline operator long () const
+         inline operator json_int_t () const
          {  
             switch (type)
             {
@@ -179,7 +179,7 @@ typedef struct _json_value
                   return u.integer;
 
                case json_double:
-                  return (long) u.dbl;
+                  return (json_int_t) u.dbl;
 
                default:
                   return 0;
@@ -199,7 +199,7 @@ typedef struct _json_value
             switch (type)
             {
                case json_integer:
-                  return u.integer;
+                  return (double) u.integer;
 
                case json_double:
                   return u.dbl;

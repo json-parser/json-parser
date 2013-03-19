@@ -617,7 +617,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                   }
 
                   top->type = json_double;
-                  top->u.dbl = top->u.integer;
+                  top->u.dbl = (double) top->u.integer;
 
                   num_digits = 0;
                   continue;
@@ -642,7 +642,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      if (top->type == json_integer)
                      {
                         top->type = json_double;
-                        top->u.dbl = top->u.integer;
+                        top->u.dbl = (double) top->u.integer;
                      }
 
                      num_digits = 0;

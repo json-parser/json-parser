@@ -39,7 +39,7 @@
 #ifdef __cplusplus
    const struct _json_value json_value_none; /* zero-d by ctor */
 #else
-   const struct _json_value json_value_none = { 0 };
+   const struct _json_value json_value_none = { 0, 0, { 0 }, { 0 } };
 #endif
 
 #include <stdlib.h>
@@ -198,7 +198,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_value * top, * root, * alloc = 0;
    json_state state;
    long flags;
-   long num_digits, num_fraction, num_e;
+   long num_digits = 0, num_fraction = 0, num_e = 0;
 
    error[0] = '\0';
 
@@ -215,8 +215,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    {
       json_uchar uchar;
       unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
-      json_char * string;
-      unsigned int string_length;
+      json_char * string = NULL;
+      unsigned int string_length = 0;
 
       top = root = 0;
       flags = flag_seek_value;

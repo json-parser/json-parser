@@ -172,7 +172,7 @@ typedef struct _json_value
          }
 
          inline operator json_int_t () const
-         {  
+         {
             switch (type)
             {
                case json_integer:
@@ -187,7 +187,7 @@ typedef struct _json_value
          }
 
          inline operator bool () const
-         {  
+         {
             if (type != json_boolean)
                return false;
 
@@ -195,7 +195,7 @@ typedef struct _json_value
          }
 
          inline operator double () const
-         {  
+         {
             switch (type)
             {
                case json_integer:
@@ -227,5 +227,3 @@ void json_value_free (json_value *);
 #endif
 
 #endif
-
-

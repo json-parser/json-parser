@@ -1,4 +1,3 @@
-
 /* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
@@ -185,9 +184,9 @@ static int new_value
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
 static const long
-   flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8, 
+   flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8,
    flag_escaped = 16,  flag_string = 32,  flag_need_colon = 64,  flag_done = 128,
-   flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,  
+   flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,
    flag_num_e_got_sign = 2048,  flag_num_e_negative = 4096;
 
 json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
@@ -835,4 +834,3 @@ void json_value_free (json_value * value)
       free (cur_value);
    }
 }
-

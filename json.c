@@ -184,7 +184,7 @@ static int new_value
 #define string_add(b)  \
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
-const static long
+static const long
    flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8, 
    flag_escaped = 16,  flag_string = 32,  flag_need_colon = 64,  flag_done = 128,
    flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,  

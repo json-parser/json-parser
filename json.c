@@ -341,7 +341,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      if (state.first_pass)
                         (*(json_char **) &top->u.object.values) += string_length + 1;
                      else
-                     {  
+                     {
                         top->u.object.values [top->u.object.length].name
                            = (json_char *) top->_reserved.object_mem;
 
@@ -520,7 +520,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             switch (top->type)
             {
             case json_object:
-               
+
                switch (b)
                {
                   whitespace:
@@ -540,7 +540,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      string_length = 0;
 
                      break;
-                  
+
                   case '}':
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
@@ -696,7 +696,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
             if (top->parent->type == json_array)
                flags |= flag_seek_value;
-               
+
             if (!state.first_pass)
             {
                json_value * parent = top->parent;

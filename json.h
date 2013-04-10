@@ -148,7 +148,7 @@ typedef struct _json_value
          }
 
          inline const struct _json_value &operator [] (const char * index) const
-         { 
+         {
             if (type != json_object)
                return json_value_none;
 
@@ -160,7 +160,7 @@ typedef struct _json_value
          }
 
          inline operator const char * () const
-         {  
+         {
             switch (type)
             {
                case json_string:

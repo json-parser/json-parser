@@ -631,7 +631,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                         goto e_failed;
                      }
 
-                     top->u.dbl += ((double) num_fraction) / (pow (10, (double) num_digits));
+                     top->u.dbl += ((double) num_fraction) / (pow ( 10.0, (double) num_digits));
                   }
 
                   if (b == 'e' || b == 'E')

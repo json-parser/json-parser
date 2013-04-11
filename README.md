@@ -17,8 +17,7 @@ API
                                 size_t length,
                                 char * error);
 
-    void json_value_free
-        (json_value *);
+    void json_value_free (json_value *);
 
 The `type` field of `json_value` is one of:
 

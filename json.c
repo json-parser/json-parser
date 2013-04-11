@@ -198,8 +198,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_value * top, * root, * alloc = 0;
    json_state state;
    long flags;
-   
-   short num_digits, num_e;
+   long num_digits, num_e;
    json_int_t num_fraction;
 
    error[0] = '\0';

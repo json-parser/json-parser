@@ -60,6 +60,9 @@ typedef struct
    unsigned long max_memory;
    int settings;
 
+   void * (* mem_alloc) (size_t, int zero);
+   void (* mem_free) (void *);
+
 } json_settings;
 
 #define json_relaxed_commas 1
@@ -223,7 +226,14 @@ json_value * json_parse_ex (json_settings * settings,
                             size_t length,
                             char * error);
 
-void json_value_free (json_value *);
+void json_free (json_value *);
+
+
+/* Not usually necessary, unless you used a custom mem_alloc and now want to
+ * use a custom mem_free.
+ */
+void json_value_free_ex (json_settings * settings,
+                         json_value *);
 
 
 #ifdef __cplusplus

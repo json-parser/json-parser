@@ -190,11 +190,14 @@ const static long
    flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,  
    flag_num_e_got_sign = 2048,  flag_num_e_negative = 4096;
 
-json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
+json_value * json_parse_ex (json_settings * settings,
+                            const json_char * json,
+                            size_t length,
+                            char * error_buf)
 {
    json_char error [128];
    unsigned int cur_line;
-   const json_char * cur_line_begin, * i;
+   const json_char * cur_line_begin, * i, * end;
    json_value * top, * root, * alloc = 0;
    json_state state;
    long flags;
@@ -202,6 +205,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_int_t num_fraction;
 
    error[0] = '\0';
+   end = (json + length);
 
    memset (&state, 0, sizeof (json_state));
    memcpy (&state.settings, settings, sizeof (json_settings));
@@ -227,7 +231,10 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
       for (i = json ;; ++ i)
       {
-         json_char b = *i;
+         json_char b = 0;
+        
+         if (json < end)
+            b = *i;
 
          if (flags & flag_done)
          {
@@ -779,12 +786,10 @@ e_failed:
    return 0;
 }
 
-json_value * json_parse (const json_char * json)
+json_value * json_parse (const json_char * json, size_t length)
 {
-   json_settings settings;
-   memset (&settings, 0, sizeof (json_settings));
-
-   return json_parse_ex (&settings, json, 0);
+   json_settings settings = {};
+   return json_parse_ex (&settings, json, length, 0);
 }
 
 void json_value_free (json_value * value)

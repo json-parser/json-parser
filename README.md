@@ -9,11 +9,13 @@ Very low footprint JSON parser written in portable ANSI C.
 API
 ---
 
-    json_value * json_parse
-        (const json_char * json);
+    json_value * json_parse (const json_char * json,
+                             size_t length);
 
-    json_value * json_parse_ex
-        (json_settings * settings, const json_char * json, char * error);
+    json_value * json_parse_ex (json_settings * settings,
+                                const json_char * json,
+                                size_t length,
+                                char * error);
 
     void json_value_free
         (json_value *);

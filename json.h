@@ -36,12 +36,12 @@
 #endif
 
 #ifndef json_int_t
-   #ifndef _WIN32
+   #if defined( _WIN32 ) && !defined( __MINGW32__ )
+      #define json_int_t __int64
+   #else
       #include <inttypes.h>
       #define json_int_t int64_t
    #else
-      #define json_int_t __int64
-   #endif
 #endif
 
 #ifdef __cplusplus
@@ -148,7 +148,7 @@ typedef struct _json_value
          }
 
          inline const struct _json_value &operator [] (const char * index) const
-         { 
+         {
             if (type != json_object)
                return json_value_none;
 
@@ -160,7 +160,7 @@ typedef struct _json_value
          }
 
          inline operator const char * () const
-         {  
+         {
             switch (type)
             {
                case json_string:
@@ -172,7 +172,7 @@ typedef struct _json_value
          }
 
          inline operator json_int_t () const
-         {  
+         {
             switch (type)
             {
                case json_integer:
@@ -187,7 +187,7 @@ typedef struct _json_value
          }
 
          inline operator bool () const
-         {  
+         {
             if (type != json_boolean)
                return false;
 
@@ -195,7 +195,7 @@ typedef struct _json_value
          }
 
          inline operator double () const
-         {  
+         {
             switch (type)
             {
                case json_integer:
@@ -227,5 +227,3 @@ void json_value_free (json_value *);
 #endif
 
 #endif
-
-

@@ -1,4 +1,3 @@
-
 /* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
@@ -39,7 +38,7 @@
 #ifdef __cplusplus
    const struct _json_value json_value_none; /* zero-d by ctor */
 #else
-   const struct _json_value json_value_none = { 0 };
+   const struct _json_value json_value_none = { 0, 0, { 0 }, { 0 } };
 #endif
 
 #include <stdlib.h>
@@ -184,10 +183,10 @@ static int new_value
 #define string_add(b)  \
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
-const static long
-   flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8, 
+static const long
+   flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8,
    flag_escaped = 16,  flag_string = 32,  flag_need_colon = 64,  flag_done = 128,
-   flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,  
+   flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,
    flag_num_e_got_sign = 2048,  flag_num_e_negative = 4096;
 
 json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
@@ -198,7 +197,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    json_value * top, * root, * alloc = 0;
    json_state state;
    long flags;
-   long num_digits, num_fraction, num_e;
+   long num_digits = 0, num_fraction = 0, num_e = 0;
 
    error[0] = '\0';
 
@@ -215,8 +214,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    {
       json_uchar uchar;
       unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
-      json_char * string;
-      unsigned int string_length;
+      json_char * string = NULL;
+      unsigned int string_length = 0;
 
       top = root = 0;
       flags = flag_seek_value;
@@ -342,7 +341,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      if (state.first_pass)
                         (*(json_char **) &top->u.object.values) += string_length + 1;
                      else
-                     {  
+                     {
                         top->u.object.values [top->u.object.length].name
                            = (json_char *) top->_reserved.object_mem;
 
@@ -521,7 +520,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             switch (top->type)
             {
             case json_object:
-               
+
                switch (b)
                {
                   whitespace:
@@ -541,7 +540,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                      string_length = 0;
 
                      break;
-                  
+
                   case '}':
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
@@ -632,7 +631,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                         goto e_failed;
                      }
 
-                     top->u.dbl += ((double) num_fraction) / (pow (10, (double) num_digits));
+                     top->u.dbl += ((double) num_fraction) / (pow ( 10.0, (double) num_digits));
                   }
 
                   if (b == 'e' || b == 'E')
@@ -697,7 +696,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
 
             if (top->parent->type == json_array)
                flags |= flag_seek_value;
-               
+
             if (!state.first_pass)
             {
                json_value * parent = top->parent;
@@ -835,4 +834,3 @@ void json_value_free (json_value * value)
       free (cur_value);
    }
 }
-

@@ -42,7 +42,6 @@
    const struct _json_value json_value_none = { 0 };
 #endif
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>

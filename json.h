@@ -44,6 +44,8 @@
    #endif
 #endif
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 
    #include <string.h>

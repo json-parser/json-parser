@@ -240,11 +240,8 @@ json_value * json_parse_ex (json_settings * settings,
 
       for (i = json ;; ++ i)
       {
-         json_char b = 0;
-        
-         if (json < end)
-            b = *i;
-
+         json_char b = (json == end ? 0 : *i);
+         
          if (flags & flag_done)
          {
             if (!b)
@@ -457,7 +454,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                      case 't':
 
-                        if (*(++ i) != 'r' || *(++ i) != 'u' || *(++ i) != 'e')
+                        if ((end - i) < 3 || *(++ i) != 'r' || *(++ i) != 'u' || *(++ i) != 'e')
                            goto e_unknown_value;
 
                         if (!new_value (&state, &top, &root, &alloc, json_boolean))
@@ -470,7 +467,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                      case 'f':
 
-                        if (*(++ i) != 'a' || *(++ i) != 'l' || *(++ i) != 's' || *(++ i) != 'e')
+                        if ((end - i) < 4 || *(++ i) != 'a' || *(++ i) != 'l' || *(++ i) != 's' || *(++ i) != 'e')
                            goto e_unknown_value;
 
                         if (!new_value (&state, &top, &root, &alloc, json_boolean))
@@ -481,7 +478,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                      case 'n':
 
-                        if (*(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
+                        if ((end - i) < 3 || *(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
                            goto e_unknown_value;
 
                         if (!new_value (&state, &top, &root, &alloc, json_null))

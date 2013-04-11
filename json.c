@@ -75,12 +75,12 @@ typedef struct
 
 } json_state;
 
-static void * default_alloc (size_t size, int zero)
+static void * default_alloc (size_t size, int zero, void * user_data)
 {
    return zero ? calloc (size, 1) : malloc (size);
 }
 
-static void default_free (void * ptr)
+static void default_free (void * ptr, void * user_data)
 {
    free (ptr);
 }
@@ -96,7 +96,7 @@ static void * json_alloc (json_state * state, unsigned long size, int zero)
       return 0;
    }
 
-   return state->settings.mem_alloc (size, zero);
+   return state->settings.mem_alloc (size, zero, state->settings.user_data);
 }
 
 static int new_value
@@ -785,7 +785,7 @@ e_failed:
    while (alloc)
    {
       top = alloc->_reserved.next_alloc;
-      state.settings.mem_free (alloc);
+      state.settings.mem_free (alloc, state.settings.user_data);
       alloc = top;
    }
 
@@ -818,7 +818,7 @@ void json_value_free_ex (json_settings * settings, json_value * value)
 
             if (!value->u.array.length)
             {
-               settings->mem_free (value->u.array.values);
+               settings->mem_free (value->u.array.values, settings->user_data);
                break;
             }
 
@@ -829,7 +829,7 @@ void json_value_free_ex (json_settings * settings, json_value * value)
 
             if (!value->u.object.length)
             {
-               settings->mem_free (value->u.object.values);
+               settings->mem_free (value->u.object.values, settings->user_data);
                break;
             }
 
@@ -838,7 +838,7 @@ void json_value_free_ex (json_settings * settings, json_value * value)
 
          case json_string:
 
-            settings->mem_free (value->u.string.ptr);
+            settings->mem_free (value->u.string.ptr, settings->user_data);
             break;
 
          default:
@@ -847,7 +847,7 @@ void json_value_free_ex (json_settings * settings, json_value * value)
 
       cur_value = value;
       value = value->parent;
-      settings->mem_free (cur_value);
+      settings->mem_free (cur_value, settings->user_data);
    }
 }
 

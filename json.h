@@ -60,8 +60,13 @@ typedef struct
    unsigned long max_memory;
    int settings;
 
-   void * (* mem_alloc) (size_t, int zero);
-   void (* mem_free) (void *);
+   /* Custom allocator support (leave null to use malloc/free)
+    */
+
+   void * (* mem_alloc) (size_t, int zero, void * user_data);
+   void (* mem_free) (void *, void * user_data);
+
+   void * user_data;  /* will be passed to mem_alloc and mem_free */
 
 } json_settings;
 

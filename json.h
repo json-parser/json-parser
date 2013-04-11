@@ -226,7 +226,7 @@ json_value * json_parse_ex (json_settings * settings,
                             size_t length,
                             char * error);
 
-void json_free (json_value *);
+void json_value_free (json_value *);
 
 
 /* Not usually necessary, unless you used a custom mem_alloc and now want to

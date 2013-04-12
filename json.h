@@ -36,10 +36,11 @@
 #endif
 
 #ifndef json_int_t
-   #ifndef _WIN32
+   #ifndef _MSC_VER
       #include <inttypes.h>
       #define json_int_t int64_t
    #else
+      /* MSVC Specific */
       #define json_int_t __int64
    #endif
 #endif

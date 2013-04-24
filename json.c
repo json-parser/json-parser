@@ -240,7 +240,7 @@ json_value * json_parse_ex (json_settings * settings,
 
       for (i = json ;; ++ i)
       {
-         json_char b = (json == end ? 0 : *i);
+         json_char b = (i == end ? 0 : *i);
          
          if (flags & flag_done)
          {

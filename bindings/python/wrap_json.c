@@ -84,7 +84,7 @@ PyObject * decode_json(char * data)
     json_settings settings;
     memset(&settings, 0, sizeof (json_settings)); 
     char error[256];
-    json_value * value = json_parse_ex(&settings, data, error);
+    json_value * value = json_parse_ex(&settings, data, strlen(data), error);
     if (value == 0) {
         return PyErr_Format(json_exception, error);
     }

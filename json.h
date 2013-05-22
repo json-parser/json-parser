@@ -117,12 +117,30 @@ typedef struct _json_value
 
          } * values;
 
+         #if defined(__cplusplus) && __cplusplus >= 201103L
+         decltype(values) begin () const
+         {  return values;
+         }
+         decltype(values) end () const
+         {  return values + length;
+         }
+         #endif
+
       } object;
 
       struct
       {
          unsigned int length;
          struct _json_value ** values;
+
+         #if defined(__cplusplus) && __cplusplus >= 201103L
+         decltype(values) begin () const
+         {  return values;
+         }
+         decltype(values) end () const
+         {  return values + length;
+         }
+         #endif
 
       } array;
 

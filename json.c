@@ -864,3 +864,29 @@ void json_value_free (json_value * value)
    json_value_free_ex (&settings, value);
 }
 
+json_value * json_value_find (json_value * parent, char * name)
+{
+    int i;
+    json_value * t;
+
+    if (parent == NULL)
+        return NULL;
+
+    if (parent->type == json_object)
+        for (i = 0; i < parent->u.object.length; i++)
+        {
+            if (!strcmp (parent->u.object.values[i].name, name))
+                return parent->u.object.values[i].value;
+            if ((t = json_value_find(parent->u.object.values[i].value, name)) != NULL)
+                return t;
+        }
+
+    if (parent->type == json_array)
+        for (i = 0; i < parent->u.array.length; i++)
+        {
+            if ((t = json_value_find(parent->u.array.values[i], name)) != NULL)
+                return t;
+        }
+
+    return NULL;
+}

@@ -1,4 +1,3 @@
-
 /* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
@@ -51,16 +50,18 @@ typedef unsigned short json_uchar;
 
 static unsigned char hex_value (json_char c)
 {
-   if (c >= 'A' && c <= 'F')
-      return (c - 'A') + 10;
-
-   if (c >= 'a' && c <= 'f')
-      return (c - 'a') + 10;
-
-   if (c >= '0' && c <= '9')
+   if (isdigit(c))
       return c - '0';
 
-   return 0xFF;
+   switch (c) {
+      case 'a': case 'A': return 0x0A;
+      case 'b': case 'B': return 0x0B;
+      case 'c': case 'C': return 0x0C;
+      case 'd': case 'D': return 0x0D;
+      case 'e': case 'E': return 0x0E;
+      case 'f': case 'F': return 0x0F;
+      default: return 0xFF;
+   }
 }
 
 typedef struct

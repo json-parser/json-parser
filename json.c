@@ -509,7 +509,13 @@ json_value * json_parse_ex (json_settings * settings,
                               while (isdigit (b) || b == '+' || b == '-'
                                         || b == 'e' || b == 'E' || b == '.')
                               {
-                                 b = *++ i;
+                                 if ( (++ i) == end)
+                                 {
+                                    b = 0;
+                                    break;
+                                 }
+
+                                 b = *i;
                               }
 
                               flags |= flag_next | flag_reproc;

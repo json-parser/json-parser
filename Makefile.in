@@ -1,9 +1,9 @@
 
-bindir = @bindir@
 exec_prefix = @exec_prefix@
-includedir = @includedir@
-libdir = @libdir@
 prefix = @prefix@
+
+includedir = $(DESTDIR)@includedir@
+libdir = $(DESTDIR)@libdir@
 
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@

@@ -1,0 +1,57 @@
+
+bindir = @bindir@
+exec_prefix = @exec_prefix@
+includedir = @includedir@
+libdir = @libdir@
+prefix = @prefix@
+
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
+
+ifeq ($(shell uname),Darwin)
+	SO_EXT := dylib
+else
+	SO_EXT := so
+endif
+
+SO_NAME := libjsonparser.$(SO_EXT).@VERSION_MAJOR@
+REAL_NAME = libjsonparser.$(SO_EXT).@PACKAGE_VERSION@
+
+all: libjsonparser.a libjsonparser.$(SO_EXT)
+
+libjsonparser.a: json.o
+	$(AR) rcs libjsonparser.a json.o
+
+libjsonparser.so: json.o
+	$(CC) -shared -Wl,-soname,$(SO_NAME) -o libjsonparser.so
+
+libjsonparser.dylib: json.o
+	$(CC) -dynamiclib json.o -o libjsonparser.dylib
+
+json.o:
+	$(CC) $(CFLAGS) -c json.c
+
+clean:
+	rm -f libjsonparser.$(SO_EXT) libjsonparser.a json.o
+
+install: libjsonparser.$(SO_EXT) libjsonparser.a
+	@echo -----
+	@echo Installing shared library: $(libdir)/libjsonparser.$(SO_EXT)
+	@install -d $(libdir)
+	@install -m 0755 libjsonparser.$(SO_EXT) $(libdir)/$(REAL_NAME)
+	@rm -f $(libdir)/$(SO_NAME)
+	@ln -s $(REAL_NAME) $(libdir)/$(SO_NAME)
+	@rm -f $(libdir)/libjsonparser.$(SO_EXT)
+	@ln -s $(SO_NAME) $(libdir)/libjsonparser.$(SO_EXT)
+	@echo Installing static library: $(libdir)/libjsonparser.a
+	@install -m 0755 libjsonparser.a $(libdir)/libjsonparser.a
+	@echo Installing header file: $(includedir)/json.h
+	@install -d $(includedir)
+	@install -m 0644 ./json.h $(includedir)/json.h
+	@echo -----
+	@echo Compiler flags: -I$(includedir)
+	@echo Linker flags: -L$(libdir) -ljsonparser
+	@echo ------
+
+.PHONY: all clean install
+

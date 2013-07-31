@@ -7,11 +7,14 @@ libdir = $(DESTDIR)@libdir@
 
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
 
 ifeq ($(shell uname),Darwin)
 	SO_EXT := dylib
 else
 	SO_EXT := so
+	CFLAGS := -fPIC $(CFLAGS)
 endif
 
 SO_NAME := libjsonparser.$(SO_EXT).@VERSION_MAJOR@
@@ -19,17 +22,17 @@ REAL_NAME = libjsonparser.$(SO_EXT).@PACKAGE_VERSION@
 
 all: libjsonparser.a libjsonparser.$(SO_EXT)
 
-libjsonparser.a: json.o
+libjsonparser.a: $(OBJS)
 	$(AR) rcs libjsonparser.a json.o
 
-libjsonparser.so: json.o
-	$(CC) -shared -Wl,-soname,$(SO_NAME) -o libjsonparser.so
+libjsonparser.so: $(OBJS)
+	$(CC) -shared -Wl,-soname,$(SO_NAME) -o libjsonparser.so $^
 
-libjsonparser.dylib: json.o
+libjsonparser.dylib: $(OBJS)
 	$(CC) -dynamiclib json.o -o libjsonparser.dylib
 
-json.o:
-	$(CC) $(CFLAGS) -c json.c
+%.o: %.c
+	$(CC) $(CFLAGS) -c $^
 
 clean:
 	rm -f libjsonparser.$(SO_EXT) libjsonparser.a json.o

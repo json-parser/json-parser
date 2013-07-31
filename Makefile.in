@@ -55,5 +55,5 @@ install: install-shared install-static
 	@echo Compiler flags: -I$(includedir)
 	@echo Linker flags: -L$(libdir) -ljsonparser
 
-.PHONY: all clean install
+.PHONY: all clean install install-shared install-static
 

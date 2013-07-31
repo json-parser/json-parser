@@ -1,4 +1,3 @@
-
 bindir = @bindir@
 exec_prefix = @exec_prefix@
 includedir = @includedir@
@@ -36,20 +35,20 @@ clean:
 
 install-shared: libjsonparser.$(SO_EXT)
 	@echo Installing shared library: $(libdir)/libjsonparser.$(SO_EXT)
-	@install -d $(libdir) || true
-	@install -m 0755 libjsonparser.$(SO_EXT) $(libdir)/$(REAL_NAME)
-	@rm -f $(libdir)/$(SO_NAME)
-	@ln -s $(REAL_NAME) $(libdir)/$(SO_NAME)
-	@rm -f $(libdir)/libjsonparser.$(SO_EXT)
-	@ln -s $(SO_NAME) $(libdir)/libjsonparser.$(SO_EXT)
-	@install -d $(includedir)/json-parser || true
-	@install -m 0644 ./json.h $(includedir)/json-parser/json.h
+	@install -d $(DESTDIR)$(libdir)
+	@install -m 0755 libjsonparser.$(SO_EXT) $(DESTDIR)$(libdir)/$(REAL_NAME)
+	@rm -f $(DESTDIR)$(libdir)/$(SO_NAME)
+	@ln -s $(REAL_NAME) $(DESTDIR)$(libdir)/$(SO_NAME)
+	@rm -f $(DESTDIR)$(libdir)/libjsonparser.$(SO_EXT)
+	@ln -s $(SO_NAME) $(DESTDIR)$(libdir)/libjsonparser.$(SO_EXT)
+	@install -d $(DESTDIR)$(includedir)/json-parser
+	@install -m 0644 ./json.h $(DESTDIR)$(includedir)/json-parser/json.h
 
 install-static: libjsonparser.a
 	@echo Installing static library: $(libdir)/libjsonparser.a
-	@install -m 0755 libjsonparser.a $(libdir)/libjsonparser.a
-	@install -d $(includedir)/json-parser || true
-	@install -m 0644 ./json.h $(includedir)/json-parser/json.h
+	@install -m 0755 libjsonparser.a $(DESTDIR)$(libdir)/libjsonparser.a
+	@install -d $(DESTDIR)$(includedir)/json-parser
+	@install -m 0644 ./json.h $(DESTDIR)$(includedir)/json-parser/json.h
 
 install: install-shared install-static
 	@echo Compiler flags: -I$(includedir)/json-parser

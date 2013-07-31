@@ -10,8 +10,8 @@ Installing
 ----------
 
 There is now a makefile which will produce a libjsonparser static and dynamic library.  However, this
-is _not_ required to build json-parser, and the source files should be happy in any build system you
-already have in place.
+is _not_ required to build json-parser, and the source files (`json.c` and `json.h`) should be happy
+in any build system you already have in place.
 
 
 API

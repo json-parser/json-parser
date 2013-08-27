@@ -218,6 +218,16 @@ json_value * json_parse_ex (json_settings * settings,
    long num_digits = 0, num_e = 0;
    json_int_t num_fraction = 0;
 
+   /* Skip UTF-8 BOM
+    */
+   if (length >= 3 && json [0] == 0xEF
+                   && json [1] == 0xBB
+                   && json [2] == 0xBF)
+   {
+      json += 3;
+      length -= 3;
+   }
+
    error[0] = '\0';
    end = (json + length);
 

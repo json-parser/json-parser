@@ -7,6 +7,7 @@ VERSION_MAJOR="1.0"
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
+AC_CHECK_TOOL(AR, ar, :)
 
 AC_ARG_ENABLE([debug],
 	[AS_HELP_STRING([--enable-debug],

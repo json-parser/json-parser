@@ -5,6 +5,8 @@ prefix = @prefix@
 includedir = $(DESTDIR)@includedir@
 libdir = $(DESTDIR)@libdir@
 
+AR = @AR@
+CC = @CC@
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
 SRCS = $(wildcard *.c)

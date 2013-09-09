@@ -258,6 +258,30 @@ void json_value_free (json_value *);
 void json_value_free_ex (json_settings * settings,
                          json_value *);
 
+/* Retrieve the underlying string of str, returns NULL if str is NULL
+ * or not a string
+ */
+char *json_string_get (json_value *str);
+
+/* Retrieve a value by its key, returns NULL if obj is NULL or not an
+ * object, or key is not in obj.
+ */
+json_value *json_object_get (json_value *obj, char *key);
+
+/* Retrieve s string attribute from an object by its key, returns NULL
+ * if obj is NULL or not an object, or if the key is not in obj or not
+ * a string.
+ */
+char *json_object_get_string (json_value *obj, char *key);
+
+/* Iterate over all elements in the array _arr, binding _idx and _elm
+ * to the corresponding index and value.
+ */
+#define json_array_for_each(_arr, _idx, _elm)                           \
+	if ((_arr) && (_arr)->type == json_array)			\
+		for (*(_idx) = 0, *(_elm) = (_arr)->u.array.values[0];	\
+		     *(_idx) < (_arr)->u.array.length;			\
+		     *(_elm) = (_arr)->u.array.values[++(*(_idx))])
 
 #ifdef __cplusplus
    } /* extern "C" */

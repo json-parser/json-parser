@@ -209,7 +209,7 @@ json_value * json_parse_ex (json_settings * settings,
                             size_t length,
                             char * error_buf)
 {
-   json_char error [128];
+   json_char error [json_error_max];
    unsigned int cur_line;
    const json_char * cur_line_begin, * i, * end;
    json_value * top, * root, * alloc = 0;

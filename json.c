@@ -824,6 +824,20 @@ json_value * json_parse (const json_char * json, size_t length)
    return json_parse_ex (&settings, json, length, 0);
 }
 
+json_value * json_value_find (const json_value * parent, const char * name)
+{
+    unsigned int i;
+
+    if ((parent == NULL) || (parent->type != json_object))
+        return NULL;
+
+    for (i = 0; i < (unsigned int) parent->u.object.length; i++)
+      if (strcmp (parent->u.object.values[i].name, name) == 0)
+        return parent->u.object.values[i].value;
+
+    return NULL;
+}
+
 void json_value_free_ex (json_settings * settings, json_value * value)
 {
    json_value * cur_value;

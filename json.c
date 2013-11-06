@@ -189,7 +189,7 @@ static int new_value
 #define string_add(b)  \
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
-const static long
+static const long
    flag_next             = 1 << 0,
    flag_reproc           = 1 << 1,
    flag_need_comma       = 1 << 2,

@@ -49,6 +49,7 @@
 #ifdef __cplusplus
 
    #include <string.h>
+   #include <string>
 
    extern "C"
    {
@@ -193,6 +194,18 @@ typedef struct _json_value
             {
                case json_string:
                   return u.string.ptr;
+
+               default:
+                  return "";
+            };
+         }
+
+         inline operator std::string () const
+         {  
+            switch (type)
+            {
+               case json_string:
+                  return std::string(u.string.ptr, u.string.length);
 
                default:
                   return "";

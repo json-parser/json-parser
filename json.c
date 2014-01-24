@@ -204,6 +204,12 @@ const static long
    flag_num_e_got_sign   = 1 << 11,
    flag_num_e_negative   = 1 << 12;
 
+#ifdef CONFIG_SUPPORT_COMMENT
+const static long
+   flag_comment_0        = 1 << 30,
+   flag_comment          = 1 << 31;
+#endif  /* CONFIG_SUPPORT_COMMENT */
+
 json_value * json_parse_ex (json_settings * settings,
                             const json_char * json,
                             size_t length,
@@ -262,6 +268,35 @@ json_value * json_parse_ex (json_settings * settings,
       {
          json_char b = (i == end ? 0 : *i);
          
+#ifdef CONFIG_SUPPORT_COMMENT
+         if (flags & flag_comment)
+         {
+            switch (b)
+            {
+              case '\r': case '\n':  flags &= ~flag_comment; break;
+            }
+            continue;
+         }
+         if (flags & flag_comment_0)
+         {
+            switch (b)
+            {
+              case '/':  flags = (flags & (~flag_comment_0)) | flag_comment; continue;
+              default:
+                 sprintf (error, "%d:%d: Unexpected `%c` in seeking comment", cur_line, e_off, b);
+                 goto e_failed;
+            }
+         }
+         if (!(flags & flag_string))
+         {
+            switch (b)
+            {
+              case '/':  flags |= flag_comment_0; continue;
+              default:   break;
+            }
+         }
+#endif /* CONFIG_SUPPORT_COMMENT */
+
          if (flags & flag_done)
          {
             if (!b)

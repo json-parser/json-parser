@@ -634,7 +634,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_debug
-enable_comment
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1254,8 +1253,6 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-debug          Build a debug version of json-parser
-                          [default=disabled]
-  --enable-comment        Allow using one line comment in json file
                           [default=disabled]
 
 Some influential environment variables:
@@ -2633,19 +2630,6 @@ fi
 
 if test "x$enable_debug" = xyes; then
 	CFLAGS="$CFLAGS -g -O0"
-fi
-
-# Check whether --enable-comment was given.
-if test "${enable_comment+set}" = set; then :
-  enableval=$enable_comment; enable_comment="$enableval"
-else
-  enable_comment=no
-
-fi
-
-
-if test "x$enable_comment" = xyes; then
-	CFLAGS="$CFLAGS -DCONFIG_SUPPORT_COMMENT"
 fi
 
 VERSION_MAJOR=$VERSION_MAJOR

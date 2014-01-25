@@ -1,0 +1,9 @@
+{   "key": "value",
+
+    /* This is a block comment, spanning
+       multiple lines */
+
+    "another_key": 42
+}
+
+

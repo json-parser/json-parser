@@ -8,6 +8,8 @@ import glob
 passed = "\033[92mPassed\033[0m"
 failed = "\033[91mFailed\033[0m"
 
+# Strict JSON tests
+#
 for i, test in enumerate(
         map(lambda file: open(file).read(), sorted(glob.glob('valid*.json')))):
 
@@ -43,4 +45,26 @@ for i, test in enumerate(
     print 'invalid/%d : %s (parsing succeeded and shouldn\'t have)' % (i, failed)
 
 
+# Extension tests
+#
+for i, test in enumerate(
+        map(lambda file: open(file).read(), sorted(glob.glob('ext-valid*.json')))):
+
+    try:
+        decoded = jsonparser.decode(test)
+        print 'ext-valid/%d : %s: %s' % (i, passed, json.dumps(decoded))
+    except jsonparser.JSONException as error:
+        print 'ext-valid/%d : Failed with error: %s' % (i, error)
+        continue
+
+for i, test in enumerate(
+        map(lambda file: open(file).read(), sorted(glob.glob('ext-invalid*.json')))):
+
+    try:
+        jsonparser.decode(test)
+    except jsonparser.JSONException as error:
+        print 'ext-invalid/%d : %s: %s' % (i, passed, error)
+        continue
+
+    print 'ext-invalid/%d : %s (parsing succeeded and shouldn\'t have)' % (i, failed)
 

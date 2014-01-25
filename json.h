@@ -1,7 +1,7 @@
 
-/* vim: set et ts=3 sw=3 ft=c:
+/* vim: set et ts=3 sw=3 sts=3 ft=c:
  *
- * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
+ * Copyright (C) 2012, 2013, 2014 James McLaughlin et al.  All rights reserved.
  * https://github.com/udp/json-parser
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,7 @@ typedef struct
 
 } json_settings;
 
-#define json_relaxed_commas 1
+#define json_enable_comments  0x01
 
 typedef enum
 {

@@ -1,6 +1,6 @@
-/* vim: set et ts=3 sw=3 ft=c:
+/* vim: set et ts=3 sw=3 sts=3 ft=c:
  *
- * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
+ * Copyright (C) 2012, 2013, 2014 James McLaughlin et al.  All rights reserved.
  * https://github.com/udp/json-parser
  *
  * Redistribution and use in source and binary forms, with or without
@@ -202,7 +202,9 @@ const static long
    flag_num_zero         = 1 << 9,
    flag_num_e            = 1 << 10,
    flag_num_e_got_sign   = 1 << 11,
-   flag_num_e_negative   = 1 << 12;
+   flag_num_e_negative   = 1 << 12,
+   flag_line_comment     = 1 << 13,
+   flag_block_comment    = 1 << 14;
 
 json_value * json_parse_ex (json_settings * settings,
                             const json_char * json,
@@ -262,22 +264,6 @@ json_value * json_parse_ex (json_settings * settings,
       {
          json_char b = (i == end ? 0 : *i);
          
-         if (flags & flag_done)
-         {
-            if (!b)
-               break;
-
-            switch (b)
-            {
-               whitespace:
-                  continue;
-
-               default:
-                  sprintf (error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
-                  goto e_failed;
-            };
-         }
-
          if (flags & flag_string)
          {
             if (!b)
@@ -301,7 +287,8 @@ json_value * json_parse_ex (json_settings * settings,
                   case 't':  string_add ('\t');  break;
                   case 'u':
 
-                    if ((uc_b1 = hex_value (*++ i)) == 0xFF || (uc_b2 = hex_value (*++ i)) == 0xFF
+                    if (end - i < 4 || 
+                        (uc_b1 = hex_value (*++ i)) == 0xFF || (uc_b2 = hex_value (*++ i)) == 0xFF
                           || (uc_b3 = hex_value (*++ i)) == 0xFF || (uc_b4 = hex_value (*++ i)) == 0xFF)
                     {
                         sprintf (error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
@@ -397,6 +384,83 @@ json_value * json_parse_ex (json_settings * settings,
             }
          }
 
+         if (state.settings.settings & json_enable_comments)
+         {
+            if (flags & (flag_line_comment | flag_block_comment))
+            {
+               if (flags & flag_line_comment)
+               {
+                  if (b == '\r' || b == '\n' || !b)
+                  {
+                     flags &= ~ flag_line_comment;
+                     -- i;  /* so null can be reproc'd */
+                  }
+
+                  continue;
+               }
+
+               if (flags & flag_block_comment)
+               {
+                  if (!b)
+                  {  sprintf (error, "%d:%d: Unexpected EOF in block comment", cur_line, e_off);
+                     goto e_failed;
+                  }
+
+                  if (b == '*' && i < (end - 1) && i [1] == '/')
+                  {
+                     flags &= ~ flag_block_comment;
+                     ++ i;  /* skip closing sequence */
+                  }
+
+                  continue;
+               }
+            }
+            else if (b == '/')
+            {
+               if (! (flags & (flag_seek_value | flag_done)) && top->type != json_object)
+               {
+                  sprintf (error, "%d:%d: Comment not allowed here", cur_line, e_off);
+                  goto e_failed;
+               }
+
+               if (++ i == end)
+               {  sprintf (error, "%d:%d: EOF unexpected", cur_line, e_off);
+                  goto e_failed;
+               }
+
+               switch (b = *i)
+               {
+                  case '/':
+                     flags |= flag_line_comment;
+                     continue;
+
+                  case '*':
+                     flags |= flag_block_comment;
+                     continue;
+
+                  default:
+                     sprintf (error, "%d:%d: Unexpected `%c` in comment opening sequence", cur_line, e_off, b);
+                     goto e_failed;
+               };
+            }
+         }
+
+         if (flags & flag_done)
+         {
+            if (!b)
+               break;
+
+            switch (b)
+            {
+               whitespace:
+                  continue;
+
+               default:
+                  sprintf (error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
+                  goto e_failed;
+            };
+         }
+
          if (flags & flag_seek_value)
          {
             switch (b)
@@ -408,7 +472,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                   if (top->type == json_array)
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                  else if (!state.settings.settings & json_relaxed_commas)
+                  else
                   {  sprintf (error, "%d:%d: Unexpected ]", cur_line, e_off);
                      goto e_failed;
                   }
@@ -569,7 +633,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                   case '"':
 
-                     if (flags & flag_need_comma && (!state.settings.settings & json_relaxed_commas))
+                     if (flags & flag_need_comma)
                      {
                         sprintf (error, "%d:%d: Expected , before \"", cur_line, e_off);
                         goto e_failed;

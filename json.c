@@ -222,9 +222,9 @@ json_value * json_parse_ex (json_settings * settings,
 
    /* Skip UTF-8 BOM
     */
-   if (length >= 3 && json [0] == 0xEF
-                   && json [1] == 0xBB
-                   && json [2] == 0xBF)
+   if (length >= 3 && ((unsigned char) json [0]) == 0xEF
+                   && ((unsigned char) json [1]) == 0xBB
+                   && ((unsigned char) json [2]) == 0xBF)
    {
       json += 3;
       length -= 3;

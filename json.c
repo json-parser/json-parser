@@ -46,7 +46,7 @@
 #include <ctype.h>
 #include <math.h>
 
-typedef unsigned short json_uchar;
+typedef unsigned int json_uchar;
 
 static unsigned char hex_value (json_char c)
 {
@@ -295,12 +295,29 @@ json_value * json_parse_ex (json_settings * settings,
                         goto e_failed;
                     }
 
-                    uc_b1 = uc_b1 * 16 + uc_b2;
-                    uc_b2 = uc_b3 * 16 + uc_b4;
+                    uc_b1 = (uc_b1 << 4) | uc_b2;
+                    uc_b2 = (uc_b3 << 4) | uc_b4;
+                    uchar = (uc_b1 << 8) | uc_b2;
 
-                    uchar = ((json_char) uc_b1) * 256 + uc_b2;
+                    if ((uchar & 0xF800) == 0xD800) {
+                        json_uchar uchar2;
+                        
+                        if (end - i < 6 || (*++ i) != '\\' || (*++ i) != 'u' ||
+                            (uc_b1 = hex_value (*++ i)) == 0xFF || (uc_b2 = hex_value (*++ i)) == 0xFF
+                              || (uc_b3 = hex_value (*++ i)) == 0xFF || (uc_b4 = hex_value (*++ i)) == 0xFF)
+                        {
+                            sprintf (error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
+                            goto e_failed;
+                        }
 
-                    if (sizeof (json_char) >= sizeof (json_uchar) || (uc_b1 == 0 && uc_b2 <= 0x7F))
+                        uc_b1 = (uc_b1 << 4) | uc_b2;
+                        uc_b2 = (uc_b3 << 4) | uc_b4;
+                        uchar2 = (uc_b1 << 8) | uc_b2;
+                        
+                        uchar = 0x010000 | ((uchar & 0x3FF) << 10) | (uchar2 & 0x3FF);
+                    }
+
+                    if (sizeof (json_char) >= sizeof (json_uchar) || (uchar <= 0x7F))
                     {
                        string_add ((json_char) uchar);
                        break;
@@ -311,19 +328,32 @@ json_value * json_parse_ex (json_settings * settings,
                         if (state.first_pass)
                            string_length += 2;
                         else
-                        {  string [string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x7) << 2);
-                           string [string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                        {  string [string_length ++] = 0xC0 | (uchar >> 6);
+                           string [string_length ++] = 0x80 | (uchar & 0x3F);
                         }
 
                         break;
                     }
 
+                    if (uchar <= 0xFFFF) {
+                        if (state.first_pass)
+                           string_length += 3;
+                        else
+                        {  string [string_length ++] = 0xE0 | (uchar >> 12);
+                           string [string_length ++] = 0x80 | ((uchar >> 6) & 0x3F);
+                           string [string_length ++] = 0x80 | (uchar & 0x3F);
+                        }
+                        
+                        break;
+                    }
+
                     if (state.first_pass)
-                       string_length += 3;
+                       string_length += 4;
                     else
-                    {  string [string_length ++] = 0xE0 | ((uc_b1 & 0xF0) >> 4);
-                       string [string_length ++] = 0x80 | ((uc_b1 & 0xF) << 2) | ((uc_b2 & 0xC0) >> 6);
-                       string [string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                    {  string [string_length ++] = 0xF0 | (uchar >> 18);
+                       string [string_length ++] = 0x80 | ((uchar >> 12) & 0x3F);
+                       string [string_length ++] = 0x80 | ((uchar >> 6) & 0x3F);
+                       string [string_length ++] = 0x80 | (uchar & 0x3F);
                     }
 
                     break;

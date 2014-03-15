@@ -68,6 +68,8 @@ typedef struct
 
    void * user_data;  /* will be passed to mem_alloc and mem_free */
 
+   size_t value_extra;  /* how much extra space to allocate for values? */
+
 } json_settings;
 
 #define json_enable_comments  0x01

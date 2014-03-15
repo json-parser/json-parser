@@ -164,10 +164,11 @@ static int new_value (json_state * state,
       return 1;
    }
 
-   value = (json_value *) json_alloc (state, sizeof (json_value), 1);
-
-   if (!value)
+   if (! (value = (json_value *) json_alloc
+         (state, sizeof (json_value) + state->settings.value_extra, 1)))
+   {
       return 0;
+   }
 
    if (!*root)
       *root = value;

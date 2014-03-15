@@ -36,3 +36,26 @@ The `type` field of `json_value` is one of:
 * `json_string` (see `u.string.ptr`, `u.string.length`)
 * `json_boolean` (see `u.boolean`)
 * `json_null`
+
+
+Compile-Time Options
+--------------------
+
+    -DJSON_TRACK_SOURCE
+
+Stores the source location (line and column number) inside each `json_value`.
+
+This is useful for application-level error reporting.
+
+
+Runtime Options
+---------------
+
+    settings |= json_enable_comments;
+
+Enables C-style `// line` and `/* block */` comments.
+
+
+
+
+

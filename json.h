@@ -155,6 +155,14 @@ typedef struct _json_value
 
    } _reserved;
 
+   #ifdef JSON_TRACK_SOURCE
+
+      /* Location of the value in the source JSON
+       */
+      unsigned int line, col;
+
+   #endif
+
 
    /* Some C++ operator sugar */
 

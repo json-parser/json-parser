@@ -36,3 +36,8 @@ The `type` field of `json_value` is one of:
 * `json_string` (see `u.string.ptr`, `u.string.length`)
 * `json_boolean` (see `u.boolean`)
 * `json_null`
+
+Some higher-level accessors are available, e.g.:
+
+* `json_object_get (obj, key)` can be used to retrieve the value of the specified key.
+* `json_array_for_each (array, idx, elem)` iterates over all items in an array.

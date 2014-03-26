@@ -978,3 +978,31 @@ void json_value_free (json_value * value)
    json_value_free_ex (&settings, value);
 }
 
+char *json_string_get (json_value *str)
+{
+	if (!str || str->type != json_string)
+		return NULL;
+
+	return str->u.string.ptr;
+}
+
+json_value *json_object_get (json_value *obj, char *key)
+{
+	int i;
+
+	if (!obj || obj->type != json_object)
+		return NULL;
+
+	for (i = 0; i < obj->u.object.length; i++) {
+		if (!strcmp (obj->u.object.values[i].name, key))
+			return obj->u.object.values[i].value;
+	}
+
+	return NULL;
+}
+
+char *json_object_get_string (json_value *obj, char *key)
+{
+	json_value *str = json_object_get (obj, key);
+	return json_string_get (str);
+}

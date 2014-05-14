@@ -36,3 +36,46 @@ The `type` field of `json_value` is one of:
 * `json_string` (see `u.string.ptr`, `u.string.length`)
 * `json_boolean` (see `u.boolean`)
 * `json_null`
+
+
+Compile-Time Options
+--------------------
+
+    -DJSON_TRACK_SOURCE
+
+Stores the source location (line and column number) inside each `json_value`.
+
+This is useful for application-level error reporting.
+
+
+Runtime Options
+---------------
+
+    settings |= json_enable_comments;
+
+Enables C-style `// line` and `/* block */` comments.
+
+    size_t value_extra
+
+The amount of space (if any) to allocate at the end of each `json_value`, in
+order to give the application space to add metadata.
+
+    void * (* mem_alloc) (size_t, int zero, void * user_data);
+    void (* mem_free) (void *, void * user_data);
+
+Custom allocator routines.  If NULL, the default `malloc` and `free` will be used.
+
+The `user_data` pointer will be forwarded from `json_settings` to allow application
+context to be passed.
+
+
+
+
+
+
+    
+
+
+
+
+

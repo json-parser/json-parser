@@ -797,7 +797,7 @@ json_value * json_parse_ex (json_settings * settings,
                         goto e_failed;
                      }
 
-                     top->u.dbl += ((double) num_fraction) / (pow (10, (double) num_digits));
+                     top->u.dbl += ((double) num_fraction) / (pow (10.0, (double) num_digits));
                   }
 
                   if (b == 'e' || b == 'E')
@@ -823,7 +823,7 @@ json_value * json_parse_ex (json_settings * settings,
                      goto e_failed;
                   }
 
-                  top->u.dbl *= pow (10, (double)
+                  top->u.dbl *= pow (10.0, (double)
                       (flags & flag_num_e_negative ? - num_e : num_e));
                }
 

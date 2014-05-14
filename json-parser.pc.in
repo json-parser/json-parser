@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: json-parser
+Description: Very low footprint JSON parser written in portable ANSI C
+Version: @VERSION_MAJOR@
+Libs: -L${libdir} -ljsonparser
+Cflags: -I${includedir}/json-parser

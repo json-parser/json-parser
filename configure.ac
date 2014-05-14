@@ -22,7 +22,9 @@ fi
 
 AC_SUBST(VERSION_MAJOR, $VERSION_MAJOR)
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([
+                 Makefile
+                 json-parser.pc])
 
 AC_OUTPUT
 

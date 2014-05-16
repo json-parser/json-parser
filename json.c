@@ -35,11 +35,7 @@
    #endif
 #endif
 
-#ifdef __cplusplus
-   const struct _json_value json_value_none; /* zero-d by ctor */
-#else
-   const struct _json_value json_value_none = { 0 };
-#endif
+const struct _json_value json_value_none;
 
 #include <stdio.h>
 #include <string.h>

@@ -69,13 +69,27 @@ The `user_data` pointer will be forwarded from `json_settings` to allow applicat
 context to be passed.
 
 
+Changes in version 1.1.0
+------------------------
 
+* UTF-8 byte order marks are now skipped if present
 
+* Allows cross-compilation by honoring --host if given (@wkz)
 
+* Maximum size for error buffer is now exposed in header (@LB--)
 
-    
+* GCC warning for `static` after `const` fixed (@batrick)
 
+* Optional support for C-style line and block comments added (@Jin-W-FS)
 
+* `name_length` field added to object values 
 
+* It is now possible to retrieve the source line/column number of a parsed `json_value` when `JSON_TRACK_SOURCE` is enabled
+
+* The application may now extend `json_value` using the `value_extra` setting
+
+* Un-ambiguate pow call in the case of C++ overloaded pow (@fcartegnie)
+
+* Fix null pointer de-reference when a non-existing array is closed and no root value is present
 
 

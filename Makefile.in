@@ -4,6 +4,7 @@ prefix = @prefix@
 
 includedir = $(DESTDIR)@includedir@
 libdir = $(DESTDIR)@libdir@
+datadir = $(DESTDIR)@datadir@
 
 AR = @AR@
 CC = @CC@
@@ -40,6 +41,9 @@ clean:
 	rm -f libjsonparser.$(SO_EXT) libjsonparser.a json.o
 
 install-shared: libjsonparser.$(SO_EXT)
+	@echo Installing pkgconfig module: $(datadir)/pkgconfig/json-parser.pc
+	@install -d $(datadir)/pkgconfig/ || true
+	@install -m 0644 json-parser.pc $(datadir)/pkgconfig/json-parser.pc
 	@echo Installing shared library: $(libdir)/libjsonparser.$(SO_EXT)
 	@install -d $(libdir) || true
 	@install -m 0755 libjsonparser.$(SO_EXT) $(libdir)/$(REAL_NAME)

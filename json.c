@@ -87,9 +87,6 @@ static void default_free (void * ptr, void * user_data)
 
 static void * json_alloc (json_state * state, unsigned long size, int zero)
 {
-   if (size == 0)
-       size = 1;
-
    if ((state->ulong_max - state->used_memory) < size)
       return 0;
 
@@ -121,6 +118,9 @@ static int new_value (json_state * state,
       {
          case json_array:
 
+            if (value->u.array.length == 0)
+               break;
+
             if (! (value->u.array.values = (json_value **) json_alloc
                (state, value->u.array.length * sizeof (json_value *), 0)) )
             {
@@ -131,6 +131,9 @@ static int new_value (json_state * state,
             break;
 
          case json_object:
+
+            if (value->u.object.length == 0)
+               break;
 
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 

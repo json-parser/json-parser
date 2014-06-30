@@ -87,6 +87,9 @@ static void default_free (void * ptr, void * user_data)
 
 static void * json_alloc (json_state * state, unsigned long size, int zero)
 {
+   if (size == 0)
+       size = 1;
+
    if ((state->ulong_max - state->used_memory) < size)
       return 0;
 

@@ -6,6 +6,8 @@ Very low footprint JSON parser written in portable ANSI C.
 
 [![Build Status](https://secure.travis-ci.org/udp/json-parser.png)](http://travis-ci.org/udp/json-parser)
 
+_Want to serialize?  Check out [json-builder](https://github.com/udp/json-builder)!_
+
 Installing
 ----------
 

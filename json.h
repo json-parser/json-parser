@@ -112,7 +112,7 @@ typedef struct _json_value
       {
          unsigned int length;
 
-         struct
+         struct json_object_entry
          {
             json_char * name;
             unsigned int name_length;

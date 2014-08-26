@@ -8,7 +8,7 @@
  * Test for json.c
  *
  * Compile with
- *         gcc -o test_json -g test_json.c json.c -lm
+ *         gcc -o test_json -I.. test_json.c ../json.c -lm
  *
  * USAGE: ./test_json <json_file>
  */

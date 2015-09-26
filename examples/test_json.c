@@ -99,7 +99,7 @@ static void process_value(json_value* value, int depth)
                         process_array(value, depth+1);
                         break;
                 case json_integer:
-                        printf("int: %d\n", value->u.integer);
+                        printf("int: %10" PRId64 "\n", value->u.integer);
                         break;
                 case json_double:
                         printf("double: %f\n", value->u.dbl);

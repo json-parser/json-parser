@@ -36,8 +36,11 @@
 /*
  * Test for json.c
  *
- * Compile with
+ * Compile (static linking) with
  *         gcc -o test_json -I.. test_json.c ../json.c -lm
+ *
+ * Compile (dynamic linking) with
+ *         gcc -o test_json -I.. test_json.c -lm -ljsonparser
  *
  * USAGE: ./test_json <json_file>
  */

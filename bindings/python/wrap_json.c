@@ -25,13 +25,17 @@
  * SUCH DAMAGE.
  */
 
+#include <Python.h>
 #include "../../json.c"
 
-PyObject * json_exception = PyErr_NewException("jsonparser.JSONException", 
-    NULL, NULL);
+PyObject * json_exception = NULL;
 
 PyObject * get_exception_class()
 {
+    if(!json_exception)
+    {
+        json_exception = PyErr_NewException("jsonparser.JSONException", NULL, NULL);
+    }
     return json_exception;
 }
 
@@ -84,12 +88,32 @@ PyObject * decode_json(char * data)
     json_settings settings;
     memset(&settings, 0, sizeof (json_settings)); 
     settings.settings = json_enable_comments;
-    char error[256];
+    char error[json_error_max];
     json_value * value = json_parse_ex(&settings, data, strlen(data), error);
     if (value == 0) {
-        return PyErr_Format(json_exception, error);
+        return PyErr_Format(get_exception_class(), error);
     }
     PyObject * converted = convert_value(value);
     json_value_free(value);
     return converted;
+}
+
+static PyMethodDef json_methods[] =
+{
+	{"decode_json", decode_json, METH_O, "Decode a utf-8 JSON string"},
+	{"decode"     , decode_json, METH_O, "Decode a utf-8 JSON string"},
+	{NULL, NULL, 0, NULL}
+};
+
+PyMODINIT_FUNC initjsonparser(void)
+{
+	PyObject *m;
+
+	m = Py_InitModule("jsonparser", json_methods);
+	if (m == NULL) {
+		return;
+	}
+
+	Py_INCREF(get_exception_class());
+	PyModule_AddObject(m, "JSONException", get_exception_class());
 }

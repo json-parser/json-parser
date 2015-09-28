@@ -92,6 +92,9 @@ static void process_value(json_value* value, int depth)
                 case json_none:
                         printf("none\n");
                         break;
+                case json_null:
+                        printf("null\n");
+                        break;
                 case json_object:
                         process_object(value, depth+1);
                         break;
@@ -99,7 +102,7 @@ static void process_value(json_value* value, int depth)
                         process_array(value, depth+1);
                         break;
                 case json_integer:
-                        printf("int: %d\n", value->u.integer);
+                        printf("int: %ld\n", value->u.integer);
                         break;
                 case json_double:
                         printf("double: %f\n", value->u.dbl);
@@ -148,7 +151,7 @@ int main(int argc, char** argv)
                 return 1;
         }
         if ( fread(file_contents, file_size, 1, fp) != 1 ) {
-                fprintf(stderr, "Unable t read content of %s\n", filename);
+                fprintf(stderr, "Unable to read content of %s\n", filename);
                 fclose(fp);
                 free(file_contents);
                 return 1;

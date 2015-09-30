@@ -1,14 +1,58 @@
-language: c
-script: "cc -ansi -pedantic -Wall -Werror -c json.c"
-branches:
-  only:
-    - master
-notifications:
-  recipients:
-    - jamie@lacewing-project.org
-  email:
-    on_success: change
-    on_failure: always
+language: c++
+sudo: false
 
+matrix:
+  include:
+    - compiler: clang
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - g++-5
+cache:
+  apt: true
+  directories:
+  - "$HOME/.travis/cmake/build/install"
 
+before_install:
+  # make sure we use gcc 5
+  - if [ "$CC"  == "gcc" ]; then export CC=gcc-5; fi
+  - if [ "$CXX" == "g++" ]; then export CXX=g++-5; fi
+  # make sure we use at least CMake 3.1 (cached)
+  - pushd . && cd $HOME
+  - git clone https://github.com/LB--/travis.git travis
+  - source "./travis/update-cmake.sh"
+  - popd
 
+script:
+  # plain compilation
+  - $CC -ansi -pedantic -Wall -Werror -c json.c
+
+  # clean
+  - git add --all && git reset --hard
+
+  # with make
+  - ./configure
+  - make
+
+  # clean
+  - git add --all && git reset --hard
+
+  # with CMake, without source tracking but with install test
+  - mkdir -p build && cd build
+  - cmake .. -DCMAKE_INSTALL_PREFIX="$(pwd)/install"
+  - cmake --build . --target install
+  - ls -R install
+  - ctest -VV
+
+  # clean
+  - cd ..
+  - git add --all && git reset --hard
+
+  # with CMake, with source tracking
+  - mkdir -p build && cd build
+  - cmake .. -DJSON_TRACK_SOURCE=ON
+  - cmake --build .
+  - ctest -VV

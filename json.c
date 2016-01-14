@@ -41,6 +41,7 @@ const struct _json_value json_value_none;
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 
 typedef unsigned int json_uchar;
 
@@ -226,7 +227,7 @@ json_value * json_parse_ex (json_settings * settings,
    json_char error [json_error_max];
    const json_char * end;
    json_value * top, * root, * alloc = 0;
-   json_state state = { 0 };
+   json_state state = { 0, UINT_MAX, ULONG_MAX, *settings, 0, NULL, 0, 0 };
    long flags;
    long num_digits = 0, num_e = 0;
    json_int_t num_fraction = 0;
@@ -244,16 +245,11 @@ json_value * json_parse_ex (json_settings * settings,
    error[0] = '\0';
    end = (json + length);
 
-   memcpy (&state.settings, settings, sizeof (json_settings));
-
    if (!state.settings.mem_alloc)
       state.settings.mem_alloc = default_alloc;
 
    if (!state.settings.mem_free)
       state.settings.mem_free = default_free;
-
-   memset (&state.uint_max, 0xFF, sizeof (state.uint_max));
-   memset (&state.ulong_max, 0xFF, sizeof (state.ulong_max));
 
    state.uint_max -= 8; /* limit of how much can be added before next check */
    state.ulong_max -= 8;

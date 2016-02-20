@@ -41,9 +41,11 @@ const struct _json_value json_value_none;
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include <stdint.h>
 
 typedef unsigned int json_uchar;
+
+// Adapted from http://stackoverflow.com/a/31902428
+static const json_int_t JSON_INT_MAX = (((unsigned json_int_t)0 - (unsigned json_int_t)1) / (unsigned json_int_t)2);
 
 static unsigned char hex_value (json_char c)
 {
@@ -61,9 +63,9 @@ static unsigned char hex_value (json_char c)
    }
 }
 
-static int would_overflow (long long value, json_char b)
+static int would_overflow (json_int_t value, json_char b)
 {
-    return ( ( INT64_MAX - ( b - '0' ) ) / 10 ) < value;
+    return ((JSON_INT_MAX - (b - '0')) / 10 ) < value;
 }
 
 typedef struct

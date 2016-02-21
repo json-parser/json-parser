@@ -33,6 +33,7 @@
    #ifndef _CRT_SECURE_NO_WARNINGS
       #define _CRT_SECURE_NO_WARNINGS
    #endif
+   #include <stdint.h>
 #endif
 
 const struct _json_value json_value_none;
@@ -44,8 +45,14 @@ const struct _json_value json_value_none;
 
 typedef unsigned int json_uchar;
 
-// Adapted from http://stackoverflow.com/a/31902428
-static const json_int_t JSON_INT_MAX = (((unsigned json_int_t)0 - (unsigned json_int_t)1) / (unsigned json_int_t)2);
+/* There has to be a better way to do this */
+static const json_int_t JSON_INT_MAX = sizeof(json_int_t) == 1
+                                       ? INT8_MAX
+                                       : (sizeof(json_int_t) == 2
+                                         ? INT16_MAX
+                                         : (sizeof(json_int_t) == 4
+                                           ? INT32_MAX
+                                           : INT64_MAX));
 
 static unsigned char hex_value (json_char c)
 {
@@ -65,7 +72,7 @@ static unsigned char hex_value (json_char c)
 
 static int would_overflow (json_int_t value, json_char b)
 {
-    return ((JSON_INT_MAX - (b - '0')) / 10 ) < value;
+   return ((JSON_INT_MAX - (b - '0')) / 10 ) < value;
 }
 
 typedef struct

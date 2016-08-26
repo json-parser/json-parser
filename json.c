@@ -328,7 +328,7 @@ json_value * json_parse_ex (json_settings * settings,
                         uc_b2 = (uc_b3 << 4) | uc_b4;
                         uchar2 = (uc_b1 << 8) | uc_b2;
                         
-                        uchar = 0x010000 | ((uchar & 0x3FF) << 10) | (uchar2 & 0x3FF);
+                        uchar = 0x010000 + ((uchar & 0x3FF) << 10) | (uchar2 & 0x3FF);
                     }
 
                     if (sizeof (json_char) >= sizeof (json_uchar) || (uchar <= 0x7F))

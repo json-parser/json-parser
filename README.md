@@ -3,6 +3,7 @@ Very low footprint JSON parser written in portable ANSI C.
 * BSD licensed with no dependencies (i.e. just drop the C file into your project)
 * Never recurses or allocates more memory than it needs
 * Very simple API with operator sugar for C++
+* Used to power a [themepark for block-based dinosaurs](http://www.mobygames.com/game/windows/lego-jurassic-world/credits)
 
 [![Build Status](https://secure.travis-ci.org/udp/json-parser.png)](http://travis-ci.org/udp/json-parser)
 

@@ -264,6 +264,9 @@ json_value * json_parse_ex (json_settings * settings,
                             size_t length,
                             char * error);
 
+json_value * json_value_find (const json_value * parent,
+                              const char * name);
+
 void json_value_free (json_value *);
 
 

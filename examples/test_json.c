@@ -84,7 +84,6 @@ static void process_array(json_value* value, int depth)
 
 static void process_value(json_value* value, int depth)
 {
-        int j;
         if (value == NULL) {
                 return;
         }
@@ -102,7 +101,7 @@ static void process_value(json_value* value, int depth)
                         process_array(value, depth+1);
                         break;
                 case json_integer:
-                        printf("int: %10" PRId64 "\n", value->u.integer);
+                        printf("int: %10" "lld" "\n", value->u.integer);
                         break;
                 case json_double:
                         printf("double: %f\n", value->u.dbl);
@@ -112,6 +111,9 @@ static void process_value(json_value* value, int depth)
                         break;
                 case json_boolean:
                         printf("bool: %d\n", value->u.boolean);
+                        break;
+				case json_null:
+                        printf("null");
                         break;
         }
 }
@@ -143,10 +145,9 @@ int main(int argc, char** argv)
                 return 1;
         }
 
-        fp = fopen(filename, "rt");
+        fp = fopen(filename, "rb");
         if (fp == NULL) {
                 fprintf(stderr, "Unable to open %s\n", filename);
-                fclose(fp);
                 free(file_contents);
                 return 1;
         }
@@ -158,7 +159,7 @@ int main(int argc, char** argv)
         }
         fclose(fp);
 
-        printf("%s\n", file_contents);
+        fwrite(file_contents, file_size, 1, stdout);
 
         printf("--------------------------------\n\n");
 

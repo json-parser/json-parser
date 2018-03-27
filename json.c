@@ -42,6 +42,24 @@ const struct _json_value json_value_none;
 #include <ctype.h>
 #include <math.h>
 
+#ifndef JSON_POW
+   #ifdef __cplusplus
+      #include <cmath>
+      #define JSON_POW std::pow
+   #else
+      #define JSON_POW pow
+      #ifdef __STDC_VERSION__
+         #if __STDC_VERSION__ >= 199901L
+            #include <tgmath.h>
+         #endif
+      #endif
+   #endif
+#else
+   #ifdef JSON_POW_HEADER
+      #include JSON_POW_HEADER
+   #endif
+#endif
+
 typedef unsigned int json_uchar;
 
 static unsigned char hex_value (json_char c)
@@ -784,7 +802,7 @@ json_value * json_parse_ex (json_settings * settings,
                   }
 
                   top->type = json_double;
-                  top->u.dbl = (double) top->u.integer;
+                  top->u.dbl = (json_double_t) top->u.integer;
 
                   num_digits = 0;
                   continue;
@@ -799,7 +817,7 @@ json_value * json_parse_ex (json_settings * settings,
                         goto e_failed;
                      }
 
-                     top->u.dbl += ((double) num_fraction) / (pow (10.0, (double) num_digits));
+                     top->u.dbl += ((json_double_t) num_fraction) / (json_double_t) (JSON_POW ((json_double_t) 10.0, (json_double_t) num_digits));
                   }
 
                   if (b == 'e' || b == 'E')
@@ -809,7 +827,7 @@ json_value * json_parse_ex (json_settings * settings,
                      if (top->type == json_integer)
                      {
                         top->type = json_double;
-                        top->u.dbl = (double) top->u.integer;
+                        top->u.dbl = (json_double_t) top->u.integer;
                      }
 
                      num_digits = 0;
@@ -825,7 +843,7 @@ json_value * json_parse_ex (json_settings * settings,
                      goto e_failed;
                   }
 
-                  top->u.dbl *= pow (10.0, (double)
+                  top->u.dbl *= (json_double_t) JSON_POW ((json_double_t) 10.0, (json_double_t)
                       (flags & flag_num_e_negative ? - num_e : num_e));
                }
 

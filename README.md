@@ -43,11 +43,23 @@ The `type` field of `json_value` is one of:
 Compile-Time Options
 --------------------
 
+The following options should be specified both when building the library and when using it in your own project, and should be specified on the command line or in your project's settings, not in any source file.
+
     -DJSON_TRACK_SOURCE
 
 Stores the source location (line and column number) inside each `json_value`.
 
 This is useful for application-level error reporting.
+
+    -Djson_int_t=long long
+
+This is the type of `u.integer`, and defaults to a 64-bit signed integer.
+
+    -Djson_double_t=double
+    -DJSON_POW=my_pow
+    -DJSON_POW_HEADER="your_header.h"
+
+This is the type of `u.dbl` and defaults to `double`, but you may change it to `float` or `long double`. If you are compiling as C++, `std::pow` is used automatically. If you are compiling as C99 or later, the generic `pow` macro from `<tgmath.h>` is used. If you are compiling as C89 or C94, you need to define `JSON_POW` to an equivalent of C99's `powf` or `powl` for `float` and `long double` respectively, otherwise `pow` will be used which will use `double` only. If you do use a custom `JSON_POW` implementation, you should also define `JSON_POW_HEADER` to the header file that defines or declares the function specified by `JOSN_POW`.
 
 
 Runtime Options

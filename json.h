@@ -44,6 +44,10 @@
    #endif
 #endif
 
+#ifndef json_double_t
+   #define json_double_t double
+#endif
+
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -108,7 +112,7 @@ typedef struct _json_value
    {
       int boolean;
       json_int_t integer;
-      double dbl;
+      json_double_t dbl;
 
       struct
       {
@@ -236,12 +240,12 @@ typedef struct _json_value
             return u.boolean != 0;
          }
 
-         inline operator double () const
+         inline operator json_double_t () const
          {  
             switch (type)
             {
                case json_integer:
-                  return (double) u.integer;
+                  return (json_double_t) u.integer;
 
                case json_double:
                   return u.dbl;

@@ -224,6 +224,8 @@ static int new_value (json_state * state,
    return 1;
 }
 
+static int trailing_garbage (const json_char * ptr);
+
 #define whitespace \
    case '\n': ++ state.cur_line;  state.cur_col = 0; /* FALLTHRU */ \
    case ' ': /* FALLTHRU */ case '\t': /* FALLTHRU */ case '\r'
@@ -301,6 +303,7 @@ json_value * json_parse_ex (json_settings * settings,
       for (state.ptr = json ;; ++ state.ptr)
       {
          json_char b = (state.ptr == end ? 0 : *state.ptr);
+         int garbage_check;
 
          if (flags & flag_string)
          {
@@ -547,8 +550,15 @@ json_value * json_parse_ex (json_settings * settings,
 
                case ']':
 
-                  if (top && top->type == json_array)
+                  if (top && top->type == json_array) {
+                     garbage_check = trailing_garbage(state.ptr);
+                     if (garbage_check) {
+                        sprintf (error, "Trailing garbage before %d:%d",
+                                 state.cur_line, state.cur_col);
+                        goto e_failed;
+                     }
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
+                  }
                   else
                   {  sprintf (error, "%u:%u: Unexpected `]`", line_and_col);
                      goto e_failed;
@@ -739,6 +749,13 @@ json_value * json_parse_ex (json_settings * settings,
                      break;
 
                   case '}':
+
+                     garbage_check = trailing_garbage(state.ptr);
+                     if (garbage_check) {
+                        sprintf (error, "Trailing garbage before %d:%d",
+                                 state.cur_line, state.cur_col);
+                        goto e_failed;
+                     }
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
                      break;
@@ -1052,4 +1069,41 @@ void json_value_free (json_value * value)
    json_settings settings = { 0 };
    settings.mem_free = default_free;
    json_value_free_ex (&settings, value);
+}
+
+static int trailing_garbage (const json_char * ptr)
+{
+   json_char marker;
+
+   do {
+      ptr--;
+   } while (isspace(*ptr));
+
+   switch (*ptr)
+   {
+      case '}':
+      case ']':
+      case '"':
+         return 0;
+
+      case 'e':
+         marker = *(--ptr);
+         if (marker == 's')
+            if (*(--ptr) == 'l' && *(--ptr) == 'a' && *(--ptr) == 'f')
+               return 0;
+         if (marker == 'u')
+            if (*(--ptr) == 'r' && *(--ptr) == 't')
+               return 0;
+         return 1;
+
+      case 'l':
+         if (*(--ptr) == 'l' && *(--ptr) == 'u' && *(--ptr) == 'n')
+            return 0;
+         return 1;
+
+      default:
+         if (isdigit(*ptr))
+            return 0;
+         return 1;
+   }
 }

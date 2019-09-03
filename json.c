@@ -46,7 +46,7 @@ const struct _json_value json_value_none;
 typedef unsigned int json_uchar;
 
 /* There has to be a better way to do this */
-static const json_int_t JSON_INT_MAX = (json_int_t)((pow(2, sizeof(json_int_t) * 8) / 2) - 1);
+static const json_int_t JSON_INT_MAX = (json_int_t)((1UL<<((sizeof(json_int_t) * 8) - 1)) - 1);
 
 static unsigned char hex_value (json_char c)
 {

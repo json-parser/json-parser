@@ -92,11 +92,13 @@ typedef struct
 
 static void * default_alloc (size_t size, int zero, void * user_data)
 {
+   (void)user_data;
    return zero ? calloc (1, size) : malloc (size);
 }
 
 static void default_free (void * ptr, void * user_data)
 {
+   (void)user_data;
    free (ptr);
 }
 
@@ -120,6 +122,8 @@ static int new_value (json_state * state,
 {
    json_value * value;
    int values_size;
+   char **temp1;
+   char *temp2;
 
    if (!state->first_pass)
    {
@@ -158,7 +162,9 @@ static int new_value (json_state * state,
                return 0;
             }
 
-            value->_reserved.object_mem = (*(char **) &value->u.object.values) + values_size;
+            temp1 = (char**)&value->u.object.values;
+            temp2 = *temp1 + values_size;
+            value->_reserved.object_mem = temp2;
 
             value->u.object.length = 0;
             break;
@@ -207,7 +213,7 @@ static int new_value (json_state * state,
 }
 
 #define whitespace \
-   case '\n': ++ state.cur_line;  state.cur_col = 0; \
+   case '\n': ++ state.cur_line; state.cur_col = 0; break; \
    case ' ': case '\t': case '\r'
 
 #define string_add(b)  \
@@ -420,8 +426,10 @@ json_value * json_parse_ex (json_settings * settings,
 
                   case json_object:
 
-                     if (state.first_pass)
-                        (*(json_char **) &top->u.object.values) += string_length + 1;
+                     if (state.first_pass) {
+                        json_char **temp1 = (json_char **) &top->u.object.values;
+                        *temp1 += string_length + 1;
+                     }
                      else
                      {  
                         top->u.object.values [top->u.object.length].name
@@ -738,6 +746,7 @@ json_value * json_parse_ex (json_settings * settings,
                         flags &= ~ flag_need_comma;
                         break;
                      }
+                     break;
 
                   default:
                      sprintf (error, "%d:%d: Unexpected `%c` in object", line_and_col, b);

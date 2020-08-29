@@ -1,7 +1,7 @@
 
 AC_PREREQ([2.49])
 
-AC_INIT([libjsonparser], [1.1.0], [])
+AC_INIT([libjsonparser], [1.1.1], [])
 VERSION_MAJOR="1.1"
 
 AC_CONFIG_MACRO_DIR([m4])

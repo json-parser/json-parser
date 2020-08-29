@@ -23,7 +23,7 @@ target_link_libraries(jsonparser m)
 # Set shared library version
 set(jsonparser_VERSION_MAJOR 1)
 set(jsonparser_VERSION_MINOR 1)
-set(jsonparser_VERSION_PATCH 0)
+set(jsonparser_VERSION_PATCH 1)
 set(jsonparser_VERSION
     ${jsonparser_VERSION_MAJOR}.${jsonparser_VERSION_MINOR}.${jsonparser_VERSION_PATCH})
 set_target_properties(jsonparser PROPERTIES VERSION ${jsonparser_VERSION})

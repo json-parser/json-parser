@@ -71,6 +71,15 @@ The `user_data` pointer will be forwarded from `json_settings` to allow applicat
 context to be passed.
 
 
+Changes in version 1.1.1
+------------------------
+
+* CMake support added
+
+* Compiler warnings fixed
+
+* Comparing float to int bug fixed
+
 Changes in version 1.1.0
 ------------------------
 

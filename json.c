@@ -219,8 +219,8 @@ static int new_value (json_state * state,
 }
 
 #define whitespace \
-   case '\n': ++ state.cur_line; state.cur_col = 0; break; \
-   case ' ': case '\t': case '\r'
+   case '\n': ++ state.cur_line;  state.cur_col = 0; /* FALLTHRU */ \
+   case ' ': /* FALLTHRU */ case '\t': /* FALLTHRU */ case '\r'
 
 #define string_add(b)  \
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
@@ -753,8 +753,7 @@ json_value * json_parse_ex (json_settings * settings,
                      {
                         flags &= ~ flag_need_comma;
                         break;
-                     }
-                     break;
+                     } /* FALLTHRU */
 
                   default:
                      sprintf (error, "%d:%d: Unexpected `%c` in object", line_and_col, b);

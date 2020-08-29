@@ -28,8 +28,6 @@
  */
 
 #include "json.h"
-// be lazy, just redefine memory management functions to use freertos primitives from portable.h
-#include "FreeRTOS.h"
 
 #ifdef _MSC_VER
    #ifndef _CRT_SECURE_NO_WARNINGS
@@ -95,17 +93,12 @@ typedef struct
 
 static void * default_alloc (size_t size, int zero, void * user_data)
 {
-	void *buf = pvPortMalloc(size);
-	if(zero)
-	{
-		memset(buf, 0, size);
-	}
-	return buf;
+   return zero ? calloc (1, size) : malloc (size);
 }
 
 static void default_free (void * ptr, void * user_data)
 {
-	vPortFree(ptr);
+   free (ptr);
 }
 
 static void * json_alloc (json_state * state, unsigned long size, int zero)
@@ -710,8 +703,7 @@ json_value * json_parse_ex (json_settings * settings,
                            continue;
                         }
                         else
-                        {
-                           sprintf (error, "%d:%d: Unexpected 0x%02x when seeking value", line_and_col, b);
+                        {  sprintf (error, "%d:%d: Unexpected %c when seeking value", line_and_col, b);
                            goto e_failed;
                         }
                   };

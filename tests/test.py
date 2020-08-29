@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 # See bindings/python for the python jsonparser module
 

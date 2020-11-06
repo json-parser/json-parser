@@ -1,4 +1,8 @@
 language: c
+arch:
+ - amd64
+ - ppc64le
+ 
 script: "cc -ansi -pedantic -Wall -Werror -c json.c"
 branches:
   only:

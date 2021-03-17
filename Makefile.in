@@ -6,13 +6,14 @@ includedir = $(DESTDIR)@includedir@
 libdir = $(DESTDIR)@libdir@
 datarootdir = @datarootdir@
 datadir = $(DESTDIR)@datadir@
+srcdir = @srcdir@
 
 AR = @AR@
 CC = @CC@
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c=.o)
+SRCS = $(wildcard $(srcdir)/*.c)
+OBJS = $(SRCS: $(srcdir)/%.c=%.o)
 
 ifeq ($(shell uname),Darwin)
 	SO_EXT := dylib
@@ -27,13 +28,13 @@ REAL_NAME = libjsonparser.$(SO_EXT).@PACKAGE_VERSION@
 all: libjsonparser.a libjsonparser.$(SO_EXT)
 
 libjsonparser.a: $(OBJS)
-	$(AR) rcs libjsonparser.a json.o
+	$(AR) rcs libjsonparser.a $^
 
 libjsonparser.so: $(OBJS)
 	$(CC) -shared -Wl,-soname,$(SO_NAME) -o libjsonparser.so $^
 
 libjsonparser.dylib: $(OBJS)
-	$(CC) -dynamiclib json.o -o libjsonparser.dylib
+	$(CC) -dynamiclib $^ -o libjsonparser.dylib
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^
@@ -53,13 +54,13 @@ install-shared: libjsonparser.$(SO_EXT)
 	@rm -f $(libdir)/libjsonparser.$(SO_EXT)
 	@ln -s $(SO_NAME) $(libdir)/libjsonparser.$(SO_EXT)
 	@install -d $(includedir)/json-parser || true
-	@install -m 0644 ./json.h $(includedir)/json-parser/json.h
+	@install -m 0644 $(srcdir)/json.h $(includedir)/json-parser
 
 install-static: libjsonparser.a
 	@echo Installing static library: $(libdir)/libjsonparser.a
 	@install -m 0755 libjsonparser.a $(libdir)/libjsonparser.a
 	@install -d $(includedir)/json-parser || true
-	@install -m 0644 ./json.h $(includedir)/json-parser/json.h
+	@install -m 0644 $(srcdir)/json.h $(includedir)/json-parser
 
 install: install-shared install-static
 	@echo Compiler flags: -I$(includedir)/json-parser

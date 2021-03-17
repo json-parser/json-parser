@@ -4,6 +4,7 @@ prefix = @prefix@
 
 includedir = $(DESTDIR)@includedir@
 libdir = $(DESTDIR)@libdir@
+datarootdir = @datarootdir@
 datadir = $(DESTDIR)@datadir@
 
 AR = @AR@

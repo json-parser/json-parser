@@ -18,6 +18,17 @@ if test "x$enable_debug" = xyes; then
 	CFLAGS="$CFLAGS -g -O0"
 fi
 
+AC_ARG_ENABLE([track-source],
+	[AS_HELP_STRING([--enable-track-source],
+		 [Lets the json-parser user retrieve the source line/column number \
+		 of a parsed json_value. @<:@default=disabled@:>@])],
+	[enable_value_pos="$enableval"],
+	[enable_value_pos=no]
+)
+if test "x$enable_value_pos" = xyes; then
+	CFLAGS="$CFLAGS -DJSON_TRACK_SOURCE"
+fi
+
 AC_SUBST(VERSION_MAJOR, $VERSION_MAJOR)
 
 AC_CONFIG_FILES([

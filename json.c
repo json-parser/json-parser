@@ -41,11 +41,35 @@ const struct _json_value json_value_none;
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 
 typedef unsigned int json_uchar;
 
 #define JSON_INT_MAX ((1ULL << ((sizeof(json_int_t) * 8) - 1)) - 1)
+
+static double json_pow10 (int exp)
+{
+  double base = 10.0;
+  double result = 1.0;
+  int neg = exp < 0;
+
+  exp = !neg ? exp : -exp;
+  exp = exp <= 308 ? exp : 309; // double max exp = 308, allows the "infinite" number
+
+  while (1)
+  {
+    if (exp & 1)
+      result *= base;
+
+    exp >>= 1;
+
+    if (!exp)
+      break;
+
+    base *= base;
+  }
+
+  return !neg ? result : 1 / result;
+}
 
 static unsigned char hex_value (json_char c)
 {
@@ -237,7 +261,7 @@ json_value * json_parse_ex (json_settings * settings,
    json_value * top, * root, * alloc = 0;
    json_state state = { 0 };
    long flags = 0;
-   double num_digits = 0, num_e = 0;
+   int num_digits = 0, num_e = 0;
    double num_fraction = 0;
 
    /* Skip UTF-8 BOM
@@ -821,7 +845,7 @@ json_value * json_parse_ex (json_settings * settings,
                         goto e_failed;
                      }
 
-                     top->u.dbl += num_fraction / pow (10.0, num_digits);
+                     top->u.dbl += num_fraction / json_pow10 (num_digits);
                   }
 
                   if (b == 'e' || b == 'E')
@@ -847,7 +871,7 @@ json_value * json_parse_ex (json_settings * settings,
                      goto e_failed;
                   }
 
-                  top->u.dbl *= pow (10.0, (flags & flag_num_e_negative ? - num_e : num_e));
+                  top->u.dbl *= json_pow10 ((flags & flag_num_e_negative ? - num_e : num_e));
                }
 
                if (flags & flag_num_negative)

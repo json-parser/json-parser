@@ -84,7 +84,7 @@ Changes in version 1.1.0
 
 * Optional support for C-style line and block comments added (@Jin-W-FS)
 
-* `name_length` field added to object values 
+* `name_length` field added to object values
 
 * It is now possible to retrieve the source line/column number of a parsed `json_value` when `JSON_TRACK_SOURCE` is enabled
 

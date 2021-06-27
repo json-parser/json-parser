@@ -220,7 +220,7 @@ static const long
    flag_next             = 1 << 0,
    flag_reproc           = 1 << 1,
    flag_need_comma       = 1 << 2,
-   flag_seek_value       = 1 << 3, 
+   flag_seek_value       = 1 << 3,
    flag_escaped          = 1 << 4,
    flag_string           = 1 << 5,
    flag_need_colon       = 1 << 6,
@@ -289,7 +289,7 @@ json_value * json_parse_ex (json_settings * settings,
       for (state.ptr = json ;; ++ state.ptr)
       {
          json_char b = (state.ptr == end ? 0 : *state.ptr);
-         
+
          if (flags & flag_string)
          {
             if (!b)
@@ -313,7 +313,7 @@ json_value * json_parse_ex (json_settings * settings,
                   case 't':  string_add ('\t');  break;
                   case 'u':
 
-                    if (end - state.ptr <= 4 || 
+                    if (end - state.ptr <= 4 ||
                         (uc_b1 = hex_value (*++ state.ptr)) == 0xFF ||
                         (uc_b2 = hex_value (*++ state.ptr)) == 0xFF ||
                         (uc_b3 = hex_value (*++ state.ptr)) == 0xFF ||
@@ -329,7 +329,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                     if ((uchar & 0xF800) == 0xD800) {
                         json_uchar uchar2;
-                        
+
                         if (end - state.ptr <= 6 || (*++ state.ptr) != '\\' || (*++ state.ptr) != 'u' ||
                             (uc_b1 = hex_value (*++ state.ptr)) == 0xFF ||
                             (uc_b2 = hex_value (*++ state.ptr)) == 0xFF ||
@@ -343,7 +343,7 @@ json_value * json_parse_ex (json_settings * settings,
                         uc_b1 = (uc_b1 << 4) | uc_b2;
                         uc_b2 = (uc_b3 << 4) | uc_b4;
                         uchar2 = (uc_b1 << 8) | uc_b2;
-                        
+
                         uchar = 0x010000 | ((uchar & 0x3FF) << 10) | (uchar2 & 0x3FF);
                     }
 
@@ -373,7 +373,7 @@ json_value * json_parse_ex (json_settings * settings,
                            string [string_length ++] = 0x80 | ((uchar >> 6) & 0x3F);
                            string [string_length ++] = 0x80 | (uchar & 0x3F);
                         }
-                        
+
                         break;
                     }
 
@@ -423,7 +423,7 @@ json_value * json_parse_ex (json_settings * settings,
                      if (state.first_pass)
                         (*(json_char **) &top->u.object.values) += string_length + 1;
                      else
-                     {  
+                     {
                         top->u.object.values [top->u.object.length].name
                            = (json_char *) top->_reserved.object_mem;
 
@@ -568,7 +568,7 @@ json_value * json_parse_ex (json_settings * settings,
                         continue;
                      }
                      else
-                     { 
+                     {
                         sprintf (error, "%d:%d: Expected : before %c",
                                  state.cur_line, state.cur_col, b);
 
@@ -706,7 +706,7 @@ json_value * json_parse_ex (json_settings * settings,
             switch (top->type)
             {
             case json_object:
-               
+
                switch (b)
                {
                   whitespace:
@@ -725,7 +725,7 @@ json_value * json_parse_ex (json_settings * settings,
                      string_length = 0;
 
                      break;
-                  
+
                   case '}':
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
@@ -893,7 +893,7 @@ json_value * json_parse_ex (json_settings * settings,
 
             if (top->parent->type == json_array)
                flags |= flag_seek_value;
-               
+
             if (!state.first_pass)
             {
                json_value * parent = top->parent;

@@ -41,10 +41,11 @@ const struct _json_value json_value_none;
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
 typedef unsigned int json_uchar;
 
-#define JSON_INT_MAX ((1ULL << ((sizeof(json_int_t) * 8) - 1)) - 1)
+#define JSON_INT_MAX ((1ULL << ((sizeof(json_int_t) * CHAR_BIT) - 1)) - 1)
 
 static double json_pow10 (int exp)
 {
@@ -53,7 +54,7 @@ static double json_pow10 (int exp)
   int neg = exp < 0;
 
   exp = !neg ? exp : -exp;
-  exp = exp <= 308 ? exp : 309; // double max exp = 308, allows the "infinite" number
+  exp = exp <= 308 ? exp : 309; /* double max exp = 308, allows the "infinite" number */
 
   while (1)
   {

@@ -67,4 +67,3 @@ for i, test in enumerate(
         continue
 
     print ('ext-invalid/%d : %s (parsing succeeded and shouldn\'t have)' % (i, failed))
-

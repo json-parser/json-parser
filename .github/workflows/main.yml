@@ -50,3 +50,8 @@ jobs:
       - name: Build examples
         run: |
           c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-example0
+
+      - name: Build with configure script
+        run: |
+          ./configure
+          make

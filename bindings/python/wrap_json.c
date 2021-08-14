@@ -27,7 +27,7 @@
 
 #include "../../json.c"
 
-PyObject * json_exception = PyErr_NewException("jsonparser.JSONException", 
+PyObject * json_exception = PyErr_NewException("jsonparser.JSONException",
     NULL, NULL);
 
 PyObject * get_exception_class()
@@ -64,7 +64,7 @@ PyObject * convert_value(json_value * data)
             value = PyFloat_FromDouble(data->u.dbl);
             break;
         case json_string:
-            value = PyUnicode_FromStringAndSize(data->u.string.ptr, 
+            value = PyUnicode_FromStringAndSize(data->u.string.ptr,
                 data->u.string.length);
             break;
         case json_boolean:
@@ -82,7 +82,7 @@ PyObject * convert_value(json_value * data)
 PyObject * decode_json(char * data)
 {
     json_settings settings;
-    memset(&settings, 0, sizeof (json_settings)); 
+    memset(&settings, 0, sizeof (json_settings));
     settings.settings = json_enable_comments;
     char error[256];
     json_value * value = json_parse_ex(&settings, data, strlen(data), error);

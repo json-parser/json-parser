@@ -27,4 +27,3 @@ AC_CONFIG_FILES([
                  json-parser.pc])
 
 AC_OUTPUT
-

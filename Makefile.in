@@ -65,4 +65,3 @@ install: install-shared install-static
 	@echo Linker flags: -L$(libdir) -ljsonparser
 
 .PHONY: all clean install install-shared install-static
-

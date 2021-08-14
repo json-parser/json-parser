@@ -4,7 +4,7 @@ Very low footprint JSON parser written in portable ANSI C.
 * Never recurses or allocates more memory than it needs
 * Very simple API with operator sugar for C++
 
-[![Build Status](https://secure.travis-ci.org/udp/json-parser.png)](http://travis-ci.org/udp/json-parser)
+[![Build Status](https://github.com/json-parser/json-parser/actions/workflows/main.yml/badge.svg)](https://github.com/json-parser/json-parser/actions)
 
 _Want to serialize?  Check out [json-builder](https://github.com/udp/json-builder)!_
 
@@ -84,7 +84,7 @@ Changes in version 1.1.0
 
 * Optional support for C-style line and block comments added (@Jin-W-FS)
 
-* `name_length` field added to object values 
+* `name_length` field added to object values
 
 * It is now possible to retrieve the source line/column number of a parsed `json_value` when `JSON_TRACK_SOURCE` is enabled
 
@@ -93,5 +93,3 @@ Changes in version 1.1.0
 * Un-ambiguate pow call in the case of C++ overloaded pow (@fcartegnie)
 
 * Fix null pointer de-reference when a non-existing array is closed and no root value is present
-
-

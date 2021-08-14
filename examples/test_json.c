@@ -84,7 +84,6 @@ static void process_array(json_value* value, int depth)
 
 static void process_value(json_value* value, int depth)
 {
-        int j;
         if (value == NULL) {
                 return;
         }
@@ -94,6 +93,9 @@ static void process_value(json_value* value, int depth)
         switch (value->type) {
                 case json_none:
                         printf("none\n");
+                        break;
+                case json_null:
+                        printf("null\n");
                         break;
                 case json_object:
                         process_object(value, depth+1);

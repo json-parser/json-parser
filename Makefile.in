@@ -31,7 +31,7 @@ libjsonparser.a: $(OBJS)
 	$(AR) rcs libjsonparser.a $^
 
 libjsonparser.so: $(OBJS)
-	$(CC) -shared -Wl,-soname,$(SO_NAME) -o libjsonparser.so $^
+	$(CC) -shared -Wl,-soname,$(SO_NAME) $(LDFLAGS) -o libjsonparser.so $^ -lm
 
 libjsonparser.dylib: $(OBJS)
 	$(CC) -dynamiclib $^ -o libjsonparser.dylib

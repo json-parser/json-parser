@@ -46,7 +46,8 @@ const struct _json_value json_value_none;
 
 typedef unsigned int json_uchar;
 
-/* There has to be a better way to do this */
+/* There has to be a better way to do this than C99 */
+#include <stdint.h>
 static const json_int_t JSON_INT_MAX = sizeof(json_int_t) == 1
                                        ? INT8_MAX
                                        : (sizeof(json_int_t) == 2

@@ -115,6 +115,9 @@ static void process_value(json_value* value, int depth)
                 case json_boolean:
                         printf("bool: %d\n", value->u.boolean);
                         break;
+                case json_null:
+                        printf("null\n");
+                        break;
         }
 }
 

@@ -1,0 +1,52 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  # Allows running this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Build json.c as ANSI C89 without JSON_TRACK_SOURCE
+        run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -shared json.c -lm -o json-c89-notrack
+
+      - name: Build json.c as ANSI C89
+        run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c89
+
+      - name: Build json.c as C99
+        run: gcc -std=c99 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c99
+
+      - name: Build json.c as C11
+        run: gcc -std=c11 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c11
+
+      - name: Build json.c as C17
+        run: gcc -std=c17 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c17
+
+      - name: Build json.c as C2x
+        run: gcc -std=c2x -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c2x
+
+      - name: Build json.c as C++98
+        run: g++ -std=c++98 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp98
+
+      - name: Build json.c as C++11
+        run: g++ -std=c++11 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp11
+
+      - name: Build json.c as C++14
+        run: g++ -std=c++14 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp14
+
+      - name: Build json.c as C++17
+        run: g++ -std=c++17 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp17
+
+      - name: Build json.c as C++2a
+        run: g++ -std=c++2a -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp2a
+
+      - name: Build examples
+        run: |
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-example0

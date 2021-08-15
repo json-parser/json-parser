@@ -7,6 +7,20 @@ VERSION_MAJOR="1.1"
 AC_PROG_CC
 AC_CHECK_TOOL(AR, ar, :)
 
+AC_ARG_WITH([math],
+	[AS_HELP_STRING([--without-math],
+		[Avoid using the math library. Use internal math functionality instead.
+		This can reduce the code size if the math library is not used elsewere. 
+		@<:@default=no@:>@, which means "Use the math library".])],
+	[with_math="$withval"],
+	[with_math=yes]
+)
+
+if test "x$with_math" = xno; then
+	CFLAGS="$CFLAGS -DJSON_INTERNAL_MATH"
+fi 
+
+
 AC_ARG_ENABLE([debug],
 	[AS_HELP_STRING([--enable-debug],
 		 [Build a debug version of json-parser @<:@default=disabled@:>@])],

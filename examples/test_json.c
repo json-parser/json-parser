@@ -1,7 +1,7 @@
 /* vim: set et ts=4
  *
- * Copyright (C) 2015 Mirko Pasqualetti  All rights reserved.
- * https://github.com/udp/json-parser
+ * Copyright (C) 2015-2021 the json-parser authors  All rights reserved.
+ * https://github.com/json-parser/json-parser
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

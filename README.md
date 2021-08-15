@@ -6,7 +6,7 @@ Very low footprint JSON parser written in portable ANSI C.
 
 [![Build Status](https://github.com/json-parser/json-parser/actions/workflows/main.yml/badge.svg)](https://github.com/json-parser/json-parser/actions)
 
-_Want to serialize?  Check out [json-builder](https://github.com/udp/json-builder)!_
+_Want to serialize?  Check out [json-builder](https://github.com/json-parser/json-builder)!_
 
 Installing
 ----------

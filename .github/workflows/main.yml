@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-gcc:
     runs-on: ubuntu-latest
     steps:
       # Checks-out repository under $GITHUB_WORKSPACE
@@ -55,3 +55,49 @@ jobs:
         run: |
           ./configure
           make
+
+  build-msvc:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch:
+          - amd64_x86
+          - amd64
+          - amd64_arm
+          - amd64_arm64
+    steps:
+      # Checks-out repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Add cl.exe to path
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Build json.c as MS C89 without JSON_TRACK_SOURCE
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /LD json.c
+
+      - name: Build json.c as MS C89
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
+
+      - name: Build json.c as C11
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c11 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
+
+      - name: Build json.c as C17
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c17 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
+
+      - name: Build json.c as C++14
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++14 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+
+      - name: Build json.c as C++17
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++17 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+
+      - name: Build json.c as C++ latest
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c

@@ -57,7 +57,7 @@ static const json_int_t JSON_INT_MAX = sizeof(json_int_t) == 1
 
 static unsigned char hex_value (json_char c)
 {
-   if (isdigit((unsigned char)c))
+   if (isdigit((int)c))
       return c - '0';
 
    switch (c) {
@@ -655,14 +655,14 @@ json_value * json_parse_ex (json_settings * settings,
 
                      default:
 
-                        if (isdigit ((unsigned char) b) || b == '-')
+                        if (isdigit ((int) b) || b == '-')
                         {
                            if (!new_value (&state, &top, &root, &alloc, json_integer))
                               goto e_alloc_failure;
 
                            if (!state.first_pass)
                            {
-                              while (isdigit ((unsigned char) b) || b == '+' || b == '-'
+                              while (isdigit ((int) b) || b == '+' || b == '-'
                                         || b == 'e' || b == 'E' || b == '.')
                               {
                                  if ( (++ state.ptr) == end)
@@ -750,7 +750,7 @@ json_value * json_parse_ex (json_settings * settings,
             case json_integer:
             case json_double:
 
-               if (isdigit ((unsigned char)b))
+               if (isdigit ((int)b))
                {
                   ++ num_digits;
 

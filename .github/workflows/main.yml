@@ -14,10 +14,10 @@ jobs:
       # Checks-out repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
 
-      - name: Build json.c as ANSI C89 without JSON_TRACK_SOURCE
+      - name: Build json.c as C89 without JSON_TRACK_SOURCE
         run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -shared json.c -lm -o json-c89-notrack
 
-      - name: Build json.c as ANSI C89
+      - name: Build json.c as C89
         run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c89
 
       - name: Build json.c as C99

@@ -1,4 +1,4 @@
-Very low footprint JSON parser written in portable ANSI C.
+Very low footprint JSON parser written in portable C89 (sometimes referred to as ANSI C).
 
 * BSD licensed with no dependencies (i.e. just drop the C file into your project)
 * Never recurses or allocates more memory than it needs

@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: json-parser
-Description: Very low footprint JSON parser written in portable ANSI C
+Description: Very low footprint JSON parser written in portable C89
 Version: @VERSION_MAJOR@
 Libs: -L${libdir} -ljsonparser
 Cflags: -I${includedir}/json-parser

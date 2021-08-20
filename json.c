@@ -42,6 +42,7 @@ const struct _json_value json_value_none;
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 typedef unsigned int json_uchar;
@@ -80,9 +81,6 @@ typedef struct
 {
    unsigned long used_memory;
 
-   unsigned int uint_max;
-   unsigned long ulong_max;
-
    json_settings settings;
    int first_pass;
 
@@ -103,7 +101,7 @@ static void default_free (void * ptr, void * user_data)
 
 static void * json_alloc (json_state * state, unsigned long size, int zero)
 {
-   if ((state->ulong_max - state->used_memory) < size)
+   if ((ULONG_MAX - 8 - state->used_memory) < size)
       return 0;
 
    if (state->settings.max_memory
@@ -269,12 +267,6 @@ json_value * json_parse_ex (json_settings * settings,
    if (!state.settings.mem_free)
       state.settings.mem_free = default_free;
 
-   memset (&state.uint_max, 0xFF, sizeof (state.uint_max));
-   memset (&state.ulong_max, 0xFF, sizeof (state.ulong_max));
-
-   state.uint_max -= 8; /* limit of how much can be added before next check */
-   state.ulong_max -= 8;
-
    for (state.first_pass = 1; state.first_pass >= 0; -- state.first_pass)
    {
       json_uchar uchar;
@@ -298,7 +290,7 @@ json_value * json_parse_ex (json_settings * settings,
                goto e_failed;
             }
 
-            if (string_length > state.uint_max)
+            if (string_length > UINT_MAX - 8)
                goto e_overflow;
 
             if (flags & flag_escaped)
@@ -922,7 +914,7 @@ json_value * json_parse_ex (json_settings * settings,
                };
             }
 
-            if ( (++ top->parent->u.array.length) > state.uint_max)
+            if ( (++ top->parent->u.array.length) > UINT_MAX - 8)
                goto e_overflow;
 
             top = top->parent;

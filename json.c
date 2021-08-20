@@ -521,7 +521,7 @@ json_value * json_parse_ex (json_settings * settings,
                default:
 
                   sprintf (error, "%u:%u: Trailing garbage: `%c`",
-                           state.cur_line, state.cur_col, b);
+                           line_and_col, b);
 
                   goto e_failed;
             };
@@ -556,7 +556,7 @@ json_value * json_parse_ex (json_settings * settings,
                      else
                      {
                         sprintf (error, "%u:%u: Expected , before %c",
-                                 state.cur_line, state.cur_col, b);
+                                 line_and_col, b);
 
                         goto e_failed;
                      }
@@ -571,7 +571,7 @@ json_value * json_parse_ex (json_settings * settings,
                      else
                      {
                         sprintf (error, "%u:%u: Expected : before %c",
-                                 state.cur_line, state.cur_col, b);
+                                 line_and_col, b);
 
                         goto e_failed;
                      }

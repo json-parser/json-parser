@@ -13,7 +13,7 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
 SRCS = $(wildcard $(srcdir)/*.c)
-OBJS = $(SRCS: $(srcdir)/%.c=%.o)
+OBJS = $(SRCS:$(srcdir)/%.c=%.o)
 
 ifeq ($(shell uname),Darwin)
 	SO_EXT := dylib
@@ -36,7 +36,7 @@ libjsonparser.so: $(OBJS)
 libjsonparser.dylib: $(OBJS)
 	$(CC) -dynamiclib $^ -o libjsonparser.dylib
 
-%.o: %.c
+%.o: $(srcdir)/%.c
 	$(CC) $(CFLAGS) -c $^
 
 clean:

@@ -258,7 +258,8 @@ typedef struct _json_value
 json_value * json_parse (const json_char * json,
                          size_t length);
 
-#define json_error_max 128
+#define JSON_ERROR_MAX 128
+#define json_error_max JSON_ERROR_MAX
 json_value * json_parse_ex (json_settings * settings,
                             const json_char * json,
                             size_t length,

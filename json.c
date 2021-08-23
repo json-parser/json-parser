@@ -774,10 +774,12 @@ json_value * json_parse_ex (json_settings * settings,
                      }
 
                      if (would_overflow(top->u.integer, b))
-                     {  -- num_digits;
+                     {
+                        json_int_t integer = top->u.integer;
+                        -- num_digits;
                         -- state.ptr;
                         top->type = json_double;
-                        top->u.dbl = (double)top->u.integer;
+                        top->u.dbl = (double)integer;
                         continue;
                      }
 

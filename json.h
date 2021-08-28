@@ -57,7 +57,7 @@
 
 typedef struct
 {
-   unsigned long max_memory;
+   unsigned long max_memory;  /* should be size_t, but would modify the API */
    int settings;
 
    /* Custom allocator support (leave null to use malloc/free)

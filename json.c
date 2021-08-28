@@ -151,8 +151,10 @@ static int new_value (json_state * state,
             if (value->u.array.length == 0)
                break;
 
+            values_size = sizeof (json_value *) * value->u.array.length;
+
             if (! (value->u.array.values = (json_value **) json_alloc
-               (state, value->u.array.length * sizeof (json_value *), 0)) )
+                  (state, values_size, 0)) )
             {
                return 0;
             }
@@ -165,7 +167,7 @@ static int new_value (json_state * state,
             if (value->u.object.length == 0)
                break;
 
-            values_size = sizeof (*value->u.object._u.values) * value->u.object.length;
+            values_size = sizeof (json_object_entry *) * value->u.object.length;
 
             if (! (value->u.object._u.values = (json_object_entry *) json_alloc
                   (state, values_size + value->u.object._u._length, 0)) )
@@ -181,7 +183,7 @@ static int new_value (json_state * state,
          case json_string:
 
             if (! (value->u.string.ptr = (json_char *) json_alloc
-               (state, (value->u.string.length + 1) * sizeof (json_char), 0)) )
+                  (state, sizeof (json_char) * (value->u.string.length + 1), 0)) )
             {
                return 0;
             }

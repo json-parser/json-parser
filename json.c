@@ -27,6 +27,7 @@
  * SUCH DAMAGE.
  */
 
+#define JSON_PRIVATE_API
 #include "json.h"
 
 #ifdef _MSC_VER
@@ -164,19 +165,15 @@ static int new_value (json_state * state,
             if (value->u.object.length == 0)
                break;
 
-            values_size = sizeof (*value->u.object.values) * value->u.object.length;
+            values_size = sizeof (*value->u.object._u.values) * value->u.object.length;
 
-            if (! (value->u.object.values = (json_object_entry *) json_alloc
-               #ifdef UINTPTR_MAX
-                  (state, values_size + ((uintptr_t) value->u.object.values), 0)) )
-               #else
-                  (state, values_size + ((size_t) value->u.object.values), 0)) )
-               #endif
+            if (! (value->u.object._u.values = (json_object_entry *) json_alloc
+                  (state, values_size + value->u.object._u._length, 0)) )
             {
                return 0;
             }
 
-            value->_reserved.object_mem = (*(char **) &value->u.object.values) + values_size;
+            value->_reserved.object_mem = (*(char **) &value->u.object._u.values) + values_size;
 
             value->u.object.length = 0;
             break;
@@ -433,13 +430,13 @@ json_value * json_parse_ex (json_settings * settings,
                   case json_object:
 
                      if (state.first_pass)
-                        (*(json_char **) &top->u.object.values) += string_length + 1;
+                        top->u.object._u._length += string_length + 1;
                      else
                      {
-                        top->u.object.values [top->u.object.length].name
+                        top->u.object._u.values [top->u.object.length].name
                            = (json_char *) top->_reserved.object_mem;
 
-                        top->u.object.values [top->u.object.length].name_length
+                        top->u.object._u.values [top->u.object.length].name_length
                            = string_length;
 
                         (*(json_char **) &top->_reserved.object_mem) += string_length + 1;
@@ -919,7 +916,7 @@ json_value * json_parse_ex (json_settings * settings,
                {
                   case json_object:
 
-                     parent->u.object.values
+                     parent->u.object._u.values
                         [parent->u.object.length].value = top;
 
                      break;
@@ -1025,11 +1022,11 @@ void json_value_free_ex (json_settings * settings, json_value * value)
 
             if (!value->u.object.length)
             {
-               settings->mem_free (value->u.object.values, settings->user_data);
+               settings->mem_free (value->u.object._u.values, settings->user_data);
                break;
             }
 
-            value = value->u.object.values [-- value->u.object.length].value;
+            value = value->u.object._u.values [-- value->u.object.length].value;
             continue;
 
          case json_string:

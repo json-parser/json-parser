@@ -33,7 +33,6 @@
    #ifndef _CRT_SECURE_NO_WARNINGS
       #define _CRT_SECURE_NO_WARNINGS
    #endif
-   #include <stdint.h>
 #endif
 
 #include <stdio.h>
@@ -43,18 +42,27 @@
 #include <limits.h>
 #include <math.h>
 
+#ifndef JSON_INT_T_OVERRIDDEN
+   #if defined(_MSC_VER)
+      /* https://docs.microsoft.com/en-us/cpp/cpp/data-type-ranges */
+      #define JSON_INT_MAX 9223372036854775807LL
+   #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+      /* C99 */
+      #define JSON_INT_MAX INT_FAST64_MAX
+   #else
+      /* C89 */
+      #include <limits.h>
+      #define JSON_INT_MAX LONG_MAX
+   #endif
+#endif
+
+#ifndef JSON_INT_MAX
+#define JSON_INT_MAX (json_int_t)(((unsigned json_int_t)(-1)) / (unsigned json_int_t)2);
+#endif
+
 typedef unsigned int json_uchar;
 
 const struct _json_value json_value_none;
-
-/* There has to be a better way to do this */
-static const json_int_t JSON_INT_MAX = sizeof(json_int_t) == 1
-                                       ? INT8_MAX
-                                       : (sizeof(json_int_t) == 2
-                                         ? INT16_MAX
-                                         : (sizeof(json_int_t) == 4
-                                           ? INT32_MAX
-                                           : INT64_MAX));
 
 static unsigned char hex_value (json_char c)
 {

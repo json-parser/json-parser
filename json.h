@@ -36,6 +36,7 @@
 #endif
 
 #ifndef json_int_t
+   #undef JSON_INT_T_OVERRIDDEN
    #if defined(_MSC_VER)
       #define json_int_t __int64
    #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
@@ -46,6 +47,8 @@
       /* C89 */
       #define json_int_t long
    #endif
+#else
+   #define JSON_INT_T_OVERRIDDEN 1
 #endif
 
 #include <stddef.h>

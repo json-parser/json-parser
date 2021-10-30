@@ -36,8 +36,6 @@
    #include <stdint.h>
 #endif
 
-const struct _json_value json_value_none;
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,6 +44,8 @@ const struct _json_value json_value_none;
 #include <math.h>
 
 typedef unsigned int json_uchar;
+
+const struct _json_value json_value_none;
 
 /* There has to be a better way to do this */
 static const json_int_t JSON_INT_MAX = sizeof(json_int_t) == 1

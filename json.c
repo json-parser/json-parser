@@ -801,13 +801,15 @@ json_value * json_parse_ex (json_settings * settings,
                }
                else if (b == '.' && top->type == json_integer)
                {
+                  json_int_t integer = top->u.integer;
+
                   if (!num_digits)
                   {  sprintf (error, "%u:%u: Expected digit before `.`", line_and_col);
                      goto e_failed;
                   }
 
                   top->type = json_double;
-                  top->u.dbl = (double) top->u.integer;
+                  top->u.dbl = (double) integer;
 
                   flags |= flag_num_got_decimal;
                   num_digits = 0;
@@ -832,8 +834,9 @@ json_value * json_parse_ex (json_settings * settings,
 
                      if (top->type == json_integer)
                      {
+                        json_int_t integer = top->u.integer;
                         top->type = json_double;
-                        top->u.dbl = (double) top->u.integer;
+                        top->u.dbl = (double) integer;
                      }
 
                      num_digits = 0;

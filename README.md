@@ -42,12 +42,24 @@ The `type` field of `json_value` is one of:
 
 Compile-Time Options
 --------------------
+Unless otherwise specified, compile definitions must be provided both when compiling `json.c` and when compiling any of your own source files that include `json.h`.
 
-    -DJSON_TRACK_SOURCE
-
+### `JSON_TRACK_SOURCE`
 Stores the source location (line and column number) inside each `json_value`.
 
 This is useful for application-level error reporting.
+
+
+### `json_int_t`
+By default, `json_int_t` is defined as `long` under C89 and `int_fast64_t` otherwise. For MSVC it is defined as `__int64` regardless of language standard support.
+
+Optionally, you may define `json_int_t` to be your own preferred type name for integer types parsed from JSON documents. It must be a signed integer type, there is no support for unsigned types. You must also define `JSON_INT_T_OVERRIDDEN` if you define `json_int_t`, otherwise your definition will be ignored. If you specify a raw primitive type without `signed` or `unsigned` (and not a typdef), `JSON_INT_MAX` will be calculated for you. Otherwise, you must provide your own definition of `JSON_INT_MAX` as the highest positive integer value that can be represented by `json_int_t`.
+
+Example usage:
+* `-DJSON_INT_T_OVERRIDDEN -Djson_int_t=short`
+* `-DJSON_INT_T_OVERRIDDEN "-Djson_int_t=signed char" -DJSON_INT_MAX=127`
+* `-DJSON_INT_T_OVERRIDDEN "-Djson_int_t=long long"`
+* `-DJSON_INT_T_OVERRIDDEN -Djson_int_t=__int128`
 
 
 Runtime Options

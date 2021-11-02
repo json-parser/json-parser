@@ -79,7 +79,7 @@ static int would_overflow (json_int_t value, json_char b)
 
 typedef struct
 {
-   unsigned long used_memory;
+   size_t used_memory;
 
    json_settings settings;
    int first_pass;
@@ -99,7 +99,7 @@ static void default_free (void * ptr, void * user_data)
    free (ptr);
 }
 
-static void * json_alloc (json_state * state, unsigned long size, int zero)
+static void * json_alloc (json_state * state, size_t size, int zero)
 {
    if ((ULONG_MAX - 8 - state->used_memory) < size)
       return 0;
@@ -118,7 +118,7 @@ static int new_value (json_state * state,
                       json_type type)
 {
    json_value * value;
-   int values_size;
+   size_t values_size;
 
    if (!state->first_pass)
    {
@@ -152,7 +152,7 @@ static int new_value (json_state * state,
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
             if (! (value->u.object.values = (json_object_entry *) json_alloc
-                  (state, values_size + ((unsigned long) value->u.object.values), 0)) )
+                  (state, values_size + ((size_t) value->u.object.values), 0)) )
             {
                return 0;
             }
@@ -243,8 +243,8 @@ json_value * json_parse_ex (json_settings * settings,
    json_value * top, * root, * alloc = 0;
    json_state state = { 0 };
    long flags = 0;
-   double num_digits = 0, num_e = 0;
-   double num_fraction = 0;
+   int num_digits = 0;
+   double num_e = 0, num_fraction = 0;
 
    /* Skip UTF-8 BOM
     */

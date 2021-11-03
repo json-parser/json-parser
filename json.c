@@ -42,6 +42,11 @@
 #include <limits.h>
 #include <math.h>
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+   /* C99 might give us uintptr_t and UINTPTR_MAX but they also might not be provided */
+   #include <stdint.h>
+#endif
+
 #ifndef JSON_INT_T_OVERRIDDEN
    #if defined(_MSC_VER)
       /* https://docs.microsoft.com/en-us/cpp/cpp/data-type-ranges */
@@ -160,7 +165,11 @@ static int new_value (json_state * state,
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
             if (! (value->u.object.values = (json_object_entry *) json_alloc
+               #ifdef UINTPTR_MAX
+                  (state, values_size + ((uintptr_t) value->u.object.values), 0)) )
+               #else
                   (state, values_size + ((size_t) value->u.object.values), 0)) )
+               #endif
             {
                return 0;
             }

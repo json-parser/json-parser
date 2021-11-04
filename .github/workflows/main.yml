@@ -29,6 +29,9 @@ jobs:
       - name: Build json.c as C17
         run: gcc -std=c17 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c17
 
+      - name: Build json.c as C17 with unused parameters as errors
+        run: gcc -std=c17 -Wall -Wpedantic -Werror -Werror=unused-parameter -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c17-unused
+
       - name: Build json.c as C2x
         run: gcc -std=c2x -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c2x
 

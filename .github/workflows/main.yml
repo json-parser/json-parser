@@ -11,7 +11,6 @@ jobs:
   build-gcc:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
 
       - name: Build json.c as C89 without JSON_TRACK_SOURCE
@@ -54,6 +53,12 @@ jobs:
         run: |
           c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-example0
 
+      - name: Build and run tests
+        run: |
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -o json-test
+          cd tests
+          ../json-test
+
       - name: Build with configure script
         run: |
           ./configure
@@ -69,7 +74,6 @@ jobs:
           - amd64_arm
           - amd64_arm64
     steps:
-      # Checks-out repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
 
       - name: Add cl.exe to path
@@ -78,29 +82,30 @@ jobs:
           arch: ${{ matrix.arch }}
 
       - name: Build json.c as MS C89 without JSON_TRACK_SOURCE
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /LD json.c
 
       - name: Build json.c as MS C89
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
 
       - name: Build json.c as C11
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c11 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
 
       - name: Build json.c as C17
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c17 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
 
       - name: Build json.c as C++14
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++14 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
 
       - name: Build json.c as C++17
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++17 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
 
       - name: Build json.c as C++ latest
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+
+      - name: Build test executable
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c /Fetests\json-test.exe
+
+      - name: Run tests
+        if: matrix.arch != 'amd64_arm' && matrix.arch != 'amd64_arm64'
+        working-directory: ./tests
+        run: ./json-test.exe

@@ -96,7 +96,7 @@ static enum json_test_result json_test(const char * filename_buffer, json_settin
 static void * noisy_alloc(size_t count, int zero, void * user_data)
 {
    void * ret;
-   (void)user_data; /* silence unused param warning */
+   (void)user_data; /* silence unused parameter warning */
    if(zero)
    {
       fprintf(stderr, "calloc %lu bytes: ", (unsigned long)count);
@@ -112,7 +112,7 @@ static void * noisy_alloc(size_t count, int zero, void * user_data)
 }
 static void noisy_free(void * ptr, void * user_data)
 {
-   (void)user_data; /* silence unused param warning */
+   (void)user_data; /* silence unused parameter warning */
    fprintf(stderr, "free %p\n", ptr);
    free(ptr);
 }

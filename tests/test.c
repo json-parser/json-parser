@@ -1,5 +1,6 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "json.h"
 
@@ -92,7 +93,7 @@ static enum json_test_result json_test(const char * filename_buffer, json_settin
    return json_test_parsed;
 }
 
-void * noisy_alloc(size_t count, int zero, void * user_data)
+static void * noisy_alloc(size_t count, int zero, void * user_data)
 {
    void * ret;
    (void)user_data; /* silence unused param warning */
@@ -109,7 +110,7 @@ void * noisy_alloc(size_t count, int zero, void * user_data)
    fprintf(stderr, "%p\n", ret);
    return ret;
 }
-void noisy_free(void * ptr, void * user_data)
+static void noisy_free(void * ptr, void * user_data)
 {
    (void)user_data; /* silence unused param warning */
    fprintf(stderr, "free %p\n", ptr);
@@ -181,12 +182,54 @@ static int json_verify(const char * filename_format, unsigned highest_file_num, 
    return result;
 }
 
+static int json_compare_string(const char * input_json, size_t input_json_len, const char * expected, size_t expected_len)
+{
+   int ret = 2;
+   json_value * parsed_json = json_parse(input_json, input_json_len);
+   if(parsed_json != NULL)
+   {
+      ret = 1;
+      if(parsed_json->type == json_string
+      && parsed_json->u.string.length == expected_len
+      && 0 == memcmp(parsed_json->u.string.ptr, expected, expected_len))
+      {
+         ret = 0;
+      }
+      json_value_free(parsed_json);
+   }
+   return ret;
+}
+
 int main(void)
 {
    int exit_code = EXIT_SUCCESS;
+
+   #define JSON_COMPARE_STRING(r, j, s) \
+   if(r != json_compare_string("\"" j "\"", (sizeof(j)/sizeof(j[0])) + 1, s, (sizeof(s)/sizeof(s[0])) - 1))\
+   {\
+      exit_code = EXIT_FAILURE;\
+      fprintf(stderr, "string comparison on line %i failed\n", __LINE__);\
+   }\
+   else\
+   {\
+      fprintf(stderr, "string comparison on line %i succeeded\n", __LINE__);\
+   }
+   JSON_COMPARE_STRING(0, "", "");
+   JSON_COMPARE_STRING(1, "a", "");
+   JSON_COMPARE_STRING(1, "", "a");
+   JSON_COMPARE_STRING(0, "a", "a");
+   JSON_COMPARE_STRING(0, "\n", "\n");
+   JSON_COMPARE_STRING(0, "\r\n", "\r\n");
+   JSON_COMPARE_STRING(0, "\\n", "\n");
+   JSON_COMPARE_STRING(0, "\\r\\n", "\r\n");
+   JSON_COMPARE_STRING(2, "abc \0 123", "abc \0 123"); /* TODO: should this really be disallowed? */
+   JSON_COMPARE_STRING(0, "abc \\u0000 123", "abc \0 123");
+   JSON_COMPARE_STRING(1, "\\ud841\\udf31", "𠜱"); /* TODO: this should actually succeed after PR #58 is merged */
+
    if(0 != json_verify(      "valid-%04u.json", 13, 0, 0)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify(    "invalid-%04u.json", 10, 0, 1)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify(  "ext-valid-%04u.json",  3, 1, 0)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify("ext-invalid-%04u.json",  2, 1, 1)){ exit_code = EXIT_FAILURE; }
+
    return exit_code;
 }

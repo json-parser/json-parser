@@ -39,8 +39,8 @@
    #undef JSON_INT_T_OVERRIDDEN
    #if defined(_MSC_VER)
       #define json_int_t __int64
-   #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-      /* C99 */
+   #elif (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || (defined(__cplusplus) && __cplusplus >= 201103L)
+      /* C99 and C++11 */
       #include <stdint.h>
       #define json_int_t int_fast64_t
    #else

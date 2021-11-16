@@ -176,7 +176,7 @@ static int new_value (json_state * state,
                return 0;
             }
 
-            value->_reserved.object_mem = (*(char **) &value->u.object.values) + values_size;
+            value->_reserved.object_mem = (void *) (((char *) value->u.object.values) + values_size);
 
             value->u.object.length = 0;
             break;

@@ -128,14 +128,35 @@ typedef struct _json_value
       {
          unsigned int length;
 
+#ifdef JSON_PRIVATE_API
+         union
+         {
+            json_object_entry * values;
+            unsigned int _length;
+
+         } _u;
+#else
          json_object_entry * values;
+#endif
 
          #if defined(__cplusplus)
          json_object_entry * begin () const
-         {  return values;
+         {
+#ifdef JSON_PRIVATE_API
+            return _u.values;
+#else
+            return values;
+#endif
+
          }
          json_object_entry * end () const
-         {  return values + length;
+         {
+#ifdef JSON_PRIVATE_API
+            return _u.values + length;
+#else
+            return values + length;
+#endif
+
          }
          #endif
 
@@ -202,8 +223,13 @@ typedef struct _json_value
                return json_value_none;
 
             for (unsigned int i = 0; i < u.object.length; ++ i)
+#ifdef JSON_PRIVATE_API
+               if (!strcmp (u.object._u.values [i].name, index))
+                  return *u.object._u.values [i].value;
+#else
                if (!strcmp (u.object.values [i].name, index))
                   return *u.object.values [i].value;
+#endif
 
             return json_value_none;
          }

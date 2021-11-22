@@ -15,6 +15,9 @@ There is now a makefile which will produce a libjsonparser static and dynamic li
 is _not_ required to build json-parser, and the source files (`json.c` and `json.h`) should be happy
 in any build system you already have in place.
 
+json-parser is also available as a package on Debian/Ubuntu:
+
+    apt-get install -y libjsonparser-dev
 
 API
 ---

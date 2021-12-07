@@ -1073,16 +1073,17 @@ void json_value_free (json_value * value)
    settings.mem_free = default_free;
    json_value_free_ex (&settings, value);
 }
+
 int trailing_garbage (const json_char * ptr)
 {
-    json_char marker = *ptr;
+    json_char * marker = (char *)ptr;
     do
     {
-        ptr--;
+        marker--;
     }
-    while (isspace(*ptr));
+    while (isspace(*marker));
 
-    switch (*ptr)
+    switch (*marker)
     {
         case '}':
         case '{':
@@ -1092,36 +1093,30 @@ int trailing_garbage (const json_char * ptr)
             return 0;
 
         case 'e':
-            marker = *(--ptr);
-            if (marker == 's')
+            // Allow true
+            if (strncmp(marker-3, "true", 4) == 0)
             {
-                if (*(--ptr) == 'l' && *(--ptr) == 'a' && *(--ptr) == 'f')
-                {
-                    return 0;
-                }
-            }
-            if (marker == 'u')
-            {
-                if (*(--ptr) == 'r' && *(--ptr) == 't')
-                {
-                    return 0;
-                }
+               return 0;
             }
 
+            // Allow false
+            if (strncmp(marker-4, "false", 5) == 0)
+            {
+               return 0;
+            }
             return 1;
 
         case 'l':
-            if (*(--ptr) == 'l' && *(--ptr) == 'u' && *(--ptr) == 'n')
+            // Allow null
+            if (strncmp(marker-3, "null", 4) == 0)
             {
-                return 0;
+               return 0;
             }
-            else
-            {
-                return 1;
-            }
+            return 1;
 
         default:
-            if (isdigit(*ptr))
+            // Allow digits
+            if (isdigit(*marker))
             {
                 return 0;
             }

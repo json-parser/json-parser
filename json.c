@@ -1081,9 +1081,11 @@ static int trailing_garbage (const json_char * ptr)
 
    switch (*ptr)
    {
-      case '}':
-      case ']':
-      case '"':
+       case '}':
+       case '{':
+       case ']':
+       case '[':
+       case '"':
          return 0;
 
       case 'e':

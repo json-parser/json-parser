@@ -224,9 +224,10 @@ static int new_value (json_state * state,
    return 1;
 }
 
-
-// Called when parsing closing brackets of objects and arrays
-// Decrements json_char ptr, ignoring whitespace, allowing digits and { } [ ] " true false null
+/*
+ * Called when parsing closing brackets of objects and arrays
+ * Decrements json_char ptr, ignoring whitespace, allowing digits and { } [ ] " true false null
+ */
 static int trailing_garbage (const json_char * ptr);
 
 #define whitespace \

@@ -1094,13 +1094,13 @@ int trailing_garbage (const json_char * ptr)
             return 0;
 
         case 'e':
-            // Allow true
+            /* Allow true */
             if (strncmp(marker-3, "true", 4) == 0)
             {
                return 0;
             }
 
-            // Allow false
+            /* Allow false */
             if (strncmp(marker-4, "false", 5) == 0)
             {
                return 0;
@@ -1108,7 +1108,7 @@ int trailing_garbage (const json_char * ptr)
             return 1;
 
         case 'l':
-            // Allow null
+            /* Allow null */
             if (strncmp(marker-3, "null", 4) == 0)
             {
                return 0;
@@ -1116,7 +1116,7 @@ int trailing_garbage (const json_char * ptr)
             return 1;
 
         default:
-            // Allow digits
+            /* Allow digits */
             if (isdigit(*marker))
             {
                 return 0;

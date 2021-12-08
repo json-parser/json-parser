@@ -554,7 +554,7 @@ json_value * json_parse_ex (json_settings * settings,
                case ']':
 
                   if (top && top->type == json_array)
-                     {
+                  {
                             if (trailing_garbage(state.ptr))
                             {
                                 sprintf (error, "Trailing garbage before %d:%d",

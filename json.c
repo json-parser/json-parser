@@ -555,16 +555,17 @@ json_value * json_parse_ex (json_settings * settings,
 
                   if (top && top->type == json_array)
                   {
-                            if (trailing_garbage(state.ptr))
-                            {
-                                sprintf (error, "Trailing garbage before %d:%d",
-                                         state.cur_line, state.cur_col);
-                                goto e_failed;
-                            }
+                     if (trailing_garbage(state.ptr))
+                     {
+                        sprintf (error, "Trailing garbage before %d:%d",
+                                 state.cur_line, state.cur_col);
+                        goto e_failed;
+                     }
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
                   }
                   else
-                  {  sprintf (error, "%u:%u: Unexpected `]`", line_and_col);
+                  {  
+                     sprintf (error, "%u:%u: Unexpected `]`", line_and_col);
                      goto e_failed;
                   }
 
@@ -756,9 +757,9 @@ json_value * json_parse_ex (json_settings * settings,
 
                      if (trailing_garbage(state.ptr))
                      {
-                         sprintf (error, "Trailing garbage before %d:%d",
-                                  state.cur_line, state.cur_col);
-                         goto e_failed;
+                        sprintf (error, "Trailing garbage before %d:%d",
+                          state.cur_line, state.cur_col);
+                        goto e_failed;
                      }
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
@@ -1077,53 +1078,53 @@ void json_value_free (json_value * value)
 
 int trailing_garbage (const json_char * ptr)
 {
-    json_char * marker = (char *)ptr;
-    do
-    {
-        marker--;
-    }
-    while (isspace(*marker));
+   json_char * marker = (char *)ptr;
+   do
+   {
+      marker--;
+   }
+   while (isspace(*marker));
 
-    switch (*marker)
-    {
-        case '}':
-        case '{':
-        case ']':
-        case '[':
-        case '"':
+   switch (*marker)
+   {
+      case '}':
+      case '{':
+      case ']':
+      case '[':
+      case '"':
+        return 0;
+
+      case 'e':
+         /* Allow true */
+         if (strncmp(marker-3, "true", 4) == 0)
+         {
             return 0;
+         }
 
-        case 'e':
-            /* Allow true */
-            if (strncmp(marker-3, "true", 4) == 0)
-            {
-               return 0;
-            }
+         /* Allow false */
+         if (strncmp(marker-4, "false", 5) == 0)
+         {
+            return 0;
+         }
+         return 1;
 
-            /* Allow false */
-            if (strncmp(marker-4, "false", 5) == 0)
-            {
-               return 0;
-            }
+      case 'l':
+         /* Allow null */
+         if (strncmp(marker-3, "null", 4) == 0)
+         {
+            return 0;
+         }
+         return 1;
+
+      default:
+         /* Allow digits */
+         if (isdigit(*marker))
+         {
+            return 0;
+         }
+         else
+         {
             return 1;
-
-        case 'l':
-            /* Allow null */
-            if (strncmp(marker-3, "null", 4) == 0)
-            {
-               return 0;
-            }
-            return 1;
-
-        default:
-            /* Allow digits */
-            if (isdigit(*marker))
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
-    }
+         }
+   }
 }

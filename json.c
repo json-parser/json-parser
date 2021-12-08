@@ -307,7 +307,6 @@ json_value * json_parse_ex (json_settings * settings,
       for (state.ptr = json ;; ++ state.ptr)
       {
          json_char b = (state.ptr == end ? 0 : *state.ptr);
-         int garbage_check;
 
          if (flags & flag_string)
          {
@@ -556,8 +555,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                   if (top && top->type == json_array)
                      {
-                            garbage_check = trailing_garbage(state.ptr);
-                            if (garbage_check)
+                            if (trailing_garbage(state.ptr))
                             {
                                 sprintf (error, "Trailing garbage before %d:%d",
                                          state.cur_line, state.cur_col);
@@ -756,8 +754,7 @@ json_value * json_parse_ex (json_settings * settings,
 
                   case '}':
 
-                     garbage_check = trailing_garbage(state.ptr);
-                     if (garbage_check)
+                     if (trailing_garbage(state.ptr))
                      {
                          sprintf (error, "Trailing garbage before %d:%d",
                                   state.cur_line, state.cur_col);

@@ -227,7 +227,7 @@ int main(void)
    JSON_COMPARE_STRING(1, "\\ud841\\udf31", "𠜱"); /* TODO: this should actually succeed after PR #58 is merged */
 
    if(0 != json_verify(      "valid-%04u.json", 13, 0, 0)){ exit_code = EXIT_FAILURE; }
-   if(0 != json_verify(    "invalid-%04u.json", 10, 0, 1)){ exit_code = EXIT_FAILURE; }
+   if(0 != json_verify(    "invalid-%04u.json", 12, 0, 1)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify(  "ext-valid-%04u.json",  3, 1, 0)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify("ext-invalid-%04u.json",  2, 1, 1)){ exit_code = EXIT_FAILURE; }
 

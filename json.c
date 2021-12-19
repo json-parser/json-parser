@@ -69,6 +69,18 @@ typedef unsigned int json_uchar;
 
 const struct _json_value json_value_none;
 
+#if defined JSON_LINTING && JSON_LINTING == 1
+int compile_option_linting = 0;
+#elif defined JSON_LINTING && JSON_LINTING == 2
+int compile_option_linting = 1;
+#endif
+
+/*
+ * Called when parsing closing brackets of objects and arrays
+ * Decrements json_char ptr, ignoring whitespace, allowing digits and { } [ ] " true false null
+ */
+static int trailing_garbage (const json_char * ptr);
+
 static unsigned char hex_value (json_char c)
 {
    if (isdigit((unsigned char)c))
@@ -223,12 +235,6 @@ static int new_value (json_state * state,
 
    return 1;
 }
-
-/*
- * Called when parsing closing brackets of objects and arrays
- * Decrements json_char ptr, ignoring whitespace, allowing digits and { } [ ] " true false null
- */
-static int trailing_garbage (const json_char * ptr);
 
 #define whitespace \
    case '\n': ++ state.cur_line;  state.cur_col = 0; /* FALLTHRU */ \
@@ -555,12 +561,17 @@ json_value * json_parse_ex (json_settings * settings,
 
                   if (top && top->type == json_array)
                   {
-                     if (trailing_garbage(state.ptr))
+                     #if defined JSON_LINTING && (JSON_LINTING == 1 || JSON_LINTING == 2)
+                     if (state.settings.settings & json_enable_linting || compile_option_linting == 1)
                      {
-                        sprintf (error, "Trailing garbage before %d:%d",
-                                 state.cur_line, state.cur_col);
-                        goto e_failed;
+                        if (trailing_garbage(state.ptr))
+                        {
+                           sprintf (error, "Trailing garbage before %d:%d",
+                                    state.cur_line, state.cur_col);
+                           goto e_failed;
+                        }
                      }
+                     #endif
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
                   }
                   else
@@ -755,12 +766,17 @@ json_value * json_parse_ex (json_settings * settings,
 
                   case '}':
 
-                     if (trailing_garbage(state.ptr))
+                     #if defined JSON_LINTING && (JSON_LINTING == 1 || JSON_LINTING == 2)
+                     if (state.settings.settings & json_enable_linting || compile_option_linting == 1)
                      {
-                        sprintf (error, "Trailing garbage before %d:%d",
-                          state.cur_line, state.cur_col);
-                        goto e_failed;
+                        if (trailing_garbage(state.ptr))
+                        {
+                           sprintf (error, "Trailing garbage before %d:%d",
+                             state.cur_line, state.cur_col);
+                           goto e_failed;
+                        }
                      }
+                     #endif
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
                      break;

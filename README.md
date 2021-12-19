@@ -69,6 +69,10 @@ settings |= json_enable_comments;
 ```
 Enables C-style `// line` and `/* block */` comments.
 ```c
+settings |= json_enable_linting;
+```
+Enables strict ECMA-404 JSON parsing
+```c
 size_t value_extra
 ```
 The amount of space (if any) to allocate at the end of each `json_value`, in

@@ -136,7 +136,8 @@ static int json_verify(const char * filename_format, unsigned highest_file_num, 
 
    if(extensions == 1)
    {
-      settings.settings = json_enable_comments;
+      settings.settings |= json_enable_comments;
+      settings.settings |= json_enable_linting;
    }
 
    for(test_num = 0; ; ++test_num)

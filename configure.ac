@@ -26,7 +26,7 @@ AC_ARG_ENABLE([track-source],
 	[enable_value_pos=no]
 )
 if test "x$enable_value_pos" = xyes; then
-	CFLAGS="$CFLAGS -DJSON_TRACK_SOURCE"
+	CFLAGS="$CFLAGS -DJSON_TRACK_SOURCE -DJSON_LINTING=1"
 fi
 
 AC_SUBST(VERSION_MAJOR, $VERSION_MAJOR)

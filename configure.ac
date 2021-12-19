@@ -26,7 +26,17 @@ AC_ARG_ENABLE([track-source],
 	[enable_value_pos=no]
 )
 if test "x$enable_value_pos" = xyes; then
-	CFLAGS="$CFLAGS -DJSON_TRACK_SOURCE -DJSON_LINTING=1"
+	CFLAGS="$CFLAGS -DJSON_TRACK_SOURCE"
+fi
+
+AC_ARG_ENABLE([enable-linting],
+	[AS_HELP_STRING([--enable-linting],
+		 [ Enables strict ECMA-404 JSON parsing. @<:@default=disabled@:>@])],
+	[enable_linting="$enableval"],
+	[enable_linting=no]
+)
+if test "x$enable_linting" = xyes; then
+	CFLAGS="$CFLAGS -DJSON_LINTING=1"
 fi
 
 AC_SUBST(VERSION_MAJOR, $VERSION_MAJOR)

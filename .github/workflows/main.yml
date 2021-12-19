@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and run tests
         run: |
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -o json-test
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -DJSON_LINTING=1 -I. json.c tests/test.c -lm -o json-test
           cd tests
           ../json-test
 
@@ -103,7 +103,7 @@ jobs:
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
 
       - name: Build test executable
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c /Fetests\json-test.exe
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /DJSON_LINTING=1 /I . /MT /Tp json.c /Tp tests\test.c /Fetests\json-test.exe
 
       - name: Run tests
         if: matrix.arch != 'amd64_arm' && matrix.arch != 'amd64_arm64'

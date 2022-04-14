@@ -1,9 +1,11 @@
 name: CI
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches-ignore:
+      - master
+      - staging.tmp
+      - trying.tmp
+      - staging-squash-merge.tmp
   # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -58,6 +60,23 @@ jobs:
           c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -o json-test
           cd tests
           ../json-test
+
+      - name: Build with ASan+UBSan and run tests
+        run: |
+          clang \
+            -fsanitize=address,undefined -fsanitize-recover=address,undefined -fno-omit-frame-pointer \
+            -g -O0 \
+            -Wall -Wpedantic -Werror -pedantic -pedantic-errors \
+            -D_ANSI_SOURCE -DJSON_TRACK_SOURCE \
+            -I. json.c tests/test.c -lm -o json-test
+          export UBSAN_OPTIONS=log_path=./SAN:print_stacktrace=1:halt_on_errors=0 ASAN_OPTIONS=log_path=./SAN:print_stacktrace=1:check_initialization_order=1:detect_leaks=1:halt_on_errors=0
+          cd tests
+          ../json-test
+          if test -n "$(find . -maxdepth 1 -name 'SAN.*' -print -quit)"
+          then
+            cat ./SAN.*
+            exit 1
+          fi
 
       - name: Build with configure script
         run: |

@@ -88,10 +88,10 @@ jobs:
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
 
       - name: Build json.c as C11
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c11 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c11 /Wall /DJSON_TRACK_SOURCE /LD json.c
 
       - name: Build json.c as C17
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c17 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c17 /Wall /DJSON_TRACK_SOURCE /LD json.c
 
       - name: Build json.c as C++14
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++14 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c

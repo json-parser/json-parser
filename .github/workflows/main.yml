@@ -11,7 +11,7 @@ jobs:
   build-gcc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build json.c as C89 without JSON_TRACK_SOURCE
         run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -shared json.c -lm -o json-c89-notrack
@@ -74,7 +74,7 @@ jobs:
           - amd64_arm
           - amd64_arm64
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Add cl.exe to path
         uses: ilammy/msvc-dev-cmd@v1

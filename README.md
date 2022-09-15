@@ -1,7 +1,7 @@
-Very low footprint JSON parser written in portable C89 (sometimes referred to as ANSI C).
+Very low footprint DOM-style JSON parser written in portable C89 (sometimes referred to as ANSI C).
 
 * BSD licensed with no dependencies (i.e. just drop the C file into your project)
-* Never recurses or allocates more memory than it needs
+* Never recurses or allocates more memory than it needs to represent the parsed JSON
 * Very simple API with operator sugar for C++
 
 [![Build Status](https://github.com/json-parser/json-parser/actions/workflows/main.yml/badge.svg)](https://github.com/json-parser/json-parser/actions)

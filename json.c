@@ -104,13 +104,13 @@ typedef struct
 
 static void * default_alloc (size_t size, int zero, void * user_data)
 {
-   (void)user_data; /* ignore unused-parameter warn */
+   (void)user_data; /* silence unused parameter warning */
    return zero ? calloc (1, size) : malloc (size);
 }
 
 static void default_free (void * ptr, void * user_data)
 {
-   (void)user_data; /* ignore unused-parameter warn */
+   (void)user_data; /* silence unused parameter warning */
    free (ptr);
 }
 

@@ -3,9 +3,9 @@ sys.path.append('..')
 
 import jsonparser
 
-data = open('test.json', 'rb').read()
+data = open('test.json', 'r').read()
 try:
     output = jsonparser.decode(data)
-    print output
-except jsonparser.JSONException, e:
-    print 'Error -> %s' % e
+    print(output)
+except jsonparser.JSONException as e:
+    print('Error -> %s' % e)

@@ -224,7 +224,7 @@ int main(void)
    JSON_COMPARE_STRING(0, "\\r\\n", "\r\n");
    JSON_COMPARE_STRING(2, "abc \0 123", "abc \0 123"); /* TODO: should this really be disallowed? */
    JSON_COMPARE_STRING(0, "abc \\u0000 123", "abc \0 123");
-   JSON_COMPARE_STRING(1, "\\ud841\\udf31", "𠜱"); /* TODO: this should actually succeed after PR #58 is merged */
+   JSON_COMPARE_STRING(0, "\\ud841\\udf31", "𠜱");
 
    if(0 != json_verify(      "valid-%04u.json", 13, 0, 0)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify(    "invalid-%04u.json", 10, 0, 1)){ exit_code = EXIT_FAILURE; }

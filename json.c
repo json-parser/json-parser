@@ -261,7 +261,7 @@ json_value * json_parse_ex (json_settings * settings,
    const json_char * end;
    json_value * top, * root, * alloc = 0;
    json_state state = { 0 };
-   long flags = 0;
+   long flags;
    int num_digits = 0;
    double num_e = 0, num_fraction = 0;
 

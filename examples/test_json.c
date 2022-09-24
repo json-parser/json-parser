@@ -168,6 +168,14 @@ int main(int argc, char** argv)
 
         value = json_parse(json,file_size);
 
+        /*
+         * Use json_parse_ex to enable runtime options
+         */
+        /* json_settings settings = { 0 }; */
+        /* settings.settings |= json_enable_comments; */
+        /* settings.settings |= json_enable_linting; */
+        /* value = json_parse_ex(&settings, json, file_size, 0); */
+
         if (value == NULL) {
                 fprintf(stderr, "Unable to parse data\n");
                 free(file_contents);

@@ -14,11 +14,11 @@ AC_ARG_ENABLE([debug],
 	[enable_debug=no]
 )
 
-if test "x$enable_debug" = xyes; then
+if test "x$enable_debug" = xyes; then 
 	CFLAGS="$CFLAGS -g -O0"
 fi
 
-AC_ARG_ENABLE([track-source],
+AC_ARG_ENABLE([track-source], 
 	[AS_HELP_STRING([--enable-track-source],
 		 [Lets the json-parser user retrieve the source line/column number \
 		 of a parsed json_value. @<:@default=disabled@:>@])],

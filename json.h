@@ -214,8 +214,13 @@ typedef struct _json_value
             {
                case json_string:
                   return u.string.ptr;
-
-               default:
+               case json_none:
+               case json_object:
+               case json_array:
+               case json_integer:
+               case json_double:
+               case json_boolean:
+               case json_null:
                   return "";
             }
          }
@@ -230,7 +235,12 @@ typedef struct _json_value
                case json_double:
                   return static_cast<json_int_t>( u.dbl );
 
-               default:
+               case json_none:
+               case json_object:
+               case json_array:
+               case json_string:
+               case json_boolean:
+               case json_null:
                   return 0;
             }
          }
@@ -253,7 +263,12 @@ typedef struct _json_value
                case json_double:
                   return u.dbl;
 
-               default:
+               case json_none:
+               case json_object:
+               case json_array:
+               case json_string:
+               case json_boolean:
+               case json_null:
                   return 0;
             }
          }

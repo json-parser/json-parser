@@ -188,7 +188,7 @@ typedef struct _json_value
          inline const struct _json_value &operator [] (int index) const
          {
             if (type != json_array || index < 0
-                     || ((unsigned int) index) >= u.array.length)
+                     || (static_cast<unsigned int>( index )) >= u.array.length)
             {
                return json_value_none;
             }
@@ -214,10 +214,15 @@ typedef struct _json_value
             {
                case json_string:
                   return u.string.ptr;
-
-               default:
+               case json_none:
+               case json_object:
+               case json_array:
+               case json_integer:
+               case json_double:
+               case json_boolean:
+               case json_null:
                   return "";
-            };
+            }
          }
 
          inline operator json_int_t () const
@@ -228,11 +233,16 @@ typedef struct _json_value
                   return u.integer;
 
                case json_double:
-                  return (json_int_t) u.dbl;
+                  return static_cast<json_int_t>( u.dbl );
 
-               default:
+               case json_none:
+               case json_object:
+               case json_array:
+               case json_string:
+               case json_boolean:
+               case json_null:
                   return 0;
-            };
+            }
          }
 
          inline operator bool () const
@@ -248,14 +258,19 @@ typedef struct _json_value
             switch (type)
             {
                case json_integer:
-                  return (double) u.integer;
+                  return static_cast<double>( u.integer );
 
                case json_double:
                   return u.dbl;
 
-               default:
+               case json_none:
+               case json_object:
+               case json_array:
+               case json_string:
+               case json_boolean:
+               case json_null:
                   return 0;
-            };
+            }
          }
 
    #endif

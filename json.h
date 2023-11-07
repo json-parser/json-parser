@@ -217,7 +217,7 @@ typedef struct _json_value
 
                default:
                   return "";
-            };
+            }
          }
 
          inline operator json_int_t () const
@@ -232,7 +232,7 @@ typedef struct _json_value
 
                default:
                   return 0;
-            };
+            }
          }
 
          inline operator bool () const
@@ -255,7 +255,7 @@ typedef struct _json_value
 
                default:
                   return 0;
-            };
+            }
          }
 
    #endif

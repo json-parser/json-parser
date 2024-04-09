@@ -46,8 +46,11 @@ jobs:
       - name: Build json.c as C++17
         run: g++ -std=c++17 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp17
 
-      - name: Build json.c as C++2a
-        run: g++ -std=c++2a -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp2a
+      - name: Build json.c as C++20
+        run: g++ -std=c++20 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp20
+
+      - name: Build json.c as C++2b
+        run: g++ -std=c++2b -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp2b
 
       - name: Build examples
         run: |
@@ -98,6 +101,9 @@ jobs:
 
       - name: Build json.c as C++17
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++17 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+
+      - name: Build json.c as C++20
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++20 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
 
       - name: Build json.c as C++ latest
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c

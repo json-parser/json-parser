@@ -40,7 +40,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#include <math.h>
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
    /* C99 might give us uintptr_t and UINTPTR_MAX but they also might not be provided */
@@ -65,9 +64,43 @@
 #define JSON_INT_MAX (json_int_t)(((unsigned json_int_t)(-1)) / (unsigned json_int_t)2);
 #endif
 
+#ifdef JSON_INTERNAL_MATH
+#  define json_pow(a) json_pow10((a))
+#else
+#  include <math.h>
+#  define json_pow(a) pow(10.0,(a))
+#endif
+
 typedef unsigned int json_uchar;
 
 const struct _json_value json_value_none;
+
+#ifdef JSON_INTERNAL_MATH
+static double json_pow10 (int exp)
+{
+  double base = 10.0;
+  double result = 1.0;
+  int neg = exp < 0;
+
+  exp = !neg ? exp : -exp;
+  exp = exp <= 308 ? exp : 309; /* double max exp = 308, allows the "infinite" number */
+
+  while (1)
+  {
+    if (exp & 1)
+      result *= base;
+
+    exp >>= 1;
+
+    if (!exp)
+      break;
+
+    base *= base;
+  }
+
+  return !neg ? result : 1 / result;
+}
+#endif
 
 static unsigned char hex_value (json_char c)
 {
@@ -846,7 +879,7 @@ json_value * json_parse_ex (json_settings * settings,
                         goto e_failed;
                      }
 
-                     top->u.dbl += num_fraction / pow (10.0, num_digits);
+                     top->u.dbl += num_fraction / json_pow (num_digits);
                   }
 
                   if (b == 'e' || b == 'E')
@@ -873,7 +906,7 @@ json_value * json_parse_ex (json_settings * settings,
                      goto e_failed;
                   }
 
-                  top->u.dbl *= pow (10.0, (flags & flag_num_e_negative ? - num_e : num_e));
+                  top->u.dbl *= json_pow ((flags & flag_num_e_negative ? - num_e : num_e));
                }
 
                if (flags & flag_num_negative)

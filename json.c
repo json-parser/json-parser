@@ -69,6 +69,18 @@ typedef unsigned int json_uchar;
 
 const struct _json_value json_value_none;
 
+#if defined JSON_LINTING && JSON_LINTING == 1
+int compile_option_linting = 0;
+#elif defined JSON_LINTING && JSON_LINTING == 2
+int compile_option_linting = 1;
+#endif
+
+/*
+ * Called when parsing closing brackets of objects and arrays
+ * Decrements json_char ptr, ignoring whitespace, allowing digits and { } [ ] " true false null
+ */
+static int trailing_garbage (const json_char * ptr);
+
 static unsigned char hex_value (json_char c)
 {
    if (isdigit((unsigned char)c))
@@ -550,9 +562,23 @@ json_value * json_parse_ex (json_settings * settings,
                case ']':
 
                   if (top && top->type == json_array)
+                  {
+                     #if defined JSON_LINTING && (JSON_LINTING == 1 || JSON_LINTING == 2)
+                     if (state.settings.settings & json_enable_linting || compile_option_linting == 1)
+                     {
+                        if (trailing_garbage(state.ptr))
+                        {
+                           sprintf (error, "Trailing garbage before %d:%d",
+                                    state.cur_line, state.cur_col);
+                           goto e_failed;
+                        }
+                     }
+                     #endif
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
+                  }
                   else
-                  {  sprintf (error, "%u:%u: Unexpected `]`", line_and_col);
+                  {  
+                     sprintf (error, "%u:%u: Unexpected `]`", line_and_col);
                      goto e_failed;
                   }
 
@@ -741,6 +767,18 @@ json_value * json_parse_ex (json_settings * settings,
                      break;
 
                   case '}':
+
+                     #if defined JSON_LINTING && (JSON_LINTING == 1 || JSON_LINTING == 2)
+                     if (state.settings.settings & json_enable_linting || compile_option_linting == 1)
+                     {
+                        if (trailing_garbage(state.ptr))
+                        {
+                           sprintf (error, "Trailing garbage before %d:%d",
+                             state.cur_line, state.cur_col);
+                           goto e_failed;
+                        }
+                     }
+                     #endif
 
                      flags = (flags & ~ flag_need_comma) | flag_next;
                      break;
@@ -1054,4 +1092,57 @@ void json_value_free (json_value * value)
    json_settings settings = { 0 };
    settings.mem_free = default_free;
    json_value_free_ex (&settings, value);
+}
+
+int trailing_garbage (const json_char * ptr)
+{
+   json_char * marker = (char *)ptr;
+   do
+   {
+      marker--;
+   }
+   while (isspace(*marker));
+
+   switch (*marker)
+   {
+      case '}':
+      case '{':
+      case ']':
+      case '[':
+      case '"':
+        return 0;
+
+      case 'e':
+         /* Allow true */
+         if (strncmp(marker-3, "true", 4) == 0)
+         {
+            return 0;
+         }
+
+         /* Allow false */
+         if (strncmp(marker-4, "false", 5) == 0)
+         {
+            return 0;
+         }
+         return 1;
+
+      case 'l':
+         /* Allow null */
+         if (strncmp(marker-3, "null", 4) == 0)
+         {
+            return 0;
+         }
+         return 1;
+
+      default:
+         /* Allow digits */
+         if (isdigit(*marker))
+         {
+            return 0;
+         }
+         else
+         {
+            return 1;
+         }
+   }
 }

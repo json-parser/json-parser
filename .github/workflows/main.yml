@@ -74,7 +74,7 @@ jobs:
         arch:
           - amd64_x86
           - amd64
-          - amd64_arm
+#          - amd64_arm # disabled because newer ARM processors and Windows 11 24H2 both removed ARM32 support
           - amd64_arm64
     steps:
       - uses: actions/checkout@v2

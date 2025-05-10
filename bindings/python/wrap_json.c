@@ -27,6 +27,18 @@
 
 #include "../../json.c"
 
+#include <Python.h>
+
+#if PY_MAJOR_VERSION >= 3
+  /* Define PyInt_* only for Python 3, where they no longer exist */
+  #ifndef PyInt_FromLong
+    #define PyInt_FromLong PyLong_FromLong
+  #endif
+  #ifndef PyInt_AsLong
+    #define PyInt_AsLong  PyLong_AsLong
+  #endif
+#endif
+
 PyObject * json_exception = PyErr_NewException("jsonparser.JSONException",
     NULL, NULL);
 

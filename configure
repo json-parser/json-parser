@@ -634,6 +634,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_math
 enable_debug
 enable_track_source
 '
@@ -1270,6 +1271,14 @@ Optional Features:
   --enable-track-source   Lets the json-parser user retrieve the source
                           line/column number of a parsed json_value.
                           [default=disabled]
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --without-math          Avoid using the math library. Use internal math
+                          functionality instead. This can reduce the code size
+                          if the math library is not used elsewere.
+                          [default=no], which means "Use the math library".
 
 Some influential environment variables:
   CC          C compiler command
@@ -2630,6 +2639,21 @@ esac
   fi
 else
   AR="$ac_cv_prog_AR"
+fi
+
+
+
+# Check whether --with-math was given.
+if test "${with_math+set}" = set; then :
+  withval=$with_math; with_math="$withval"
+else
+  with_math=yes
+
+fi
+
+
+if test "x$with_math" = xno; then
+	CFLAGS="$CFLAGS -DJSON_INTERNAL_MATH"
 fi
 
 

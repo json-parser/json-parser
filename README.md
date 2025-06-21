@@ -61,6 +61,16 @@ Example usage:
 * `"-Djson_int_t=long long"`
 * `-Djson_int_t=__int128`
 
+### `JSON_LINTING`
+Loads code branches used for strict ECMA-404 JSON parsing.
+
+Setting JSON_LINTING to 1 additionally requires the use of the runtime option (json_enable_comments) to perform linting.
+Setting JSON_LINTING to 2 performs linting without requiring the runtime option.
+
+Example usage:
+* `-DJSON_LINTING=1`
+* `-DJSON_LINTING=2`
+
 
 Runtime Options
 ---------------
@@ -68,6 +78,10 @@ Runtime Options
 settings |= json_enable_comments;
 ```
 Enables C-style `// line` and `/* block */` comments.
+```c
+settings |= json_enable_linting;
+```
+Enables strict ECMA-404 JSON parsing
 ```c
 size_t value_extra
 ```

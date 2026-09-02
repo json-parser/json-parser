@@ -166,6 +166,11 @@ static int new_value (json_state * state,
 
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
+            /*
+               The `values` pointer holds a size calculated by the first pass.
+               The size represents the storage space needed for object key names.
+               Now during the second pass, it's replaced with an actual allocation.
+            */
             if (! (value->u.object.values = (json_object_entry *) json_alloc
                #ifdef UINTPTR_MAX
                   (state, values_size + ((uintptr_t) value->u.object.values), 0)) )
@@ -432,9 +437,21 @@ json_value * json_parse_ex (json_settings * settings,
 
                   case json_object:
 
+                     /*
+                        The `values` pointer holds an increasing size during the first pass.
+                        The size represents the storage space needed for object key names.
+                        It's used by `new_value` when transitioning into the second pass.
+                        From then on, it's a pointer to allocated memory.
+                     */
                      if (state.first_pass) {
-                        json_char **chars = (json_char **) &top->u.object.values;
-                        chars[0] += string_length + 1;
+                        #ifdef UINTPTR_MAX
+                           uintptr_t chars = (uintptr_t) top->u.object.values;
+                        #else
+                           size_t chars = (size_t) top->u.object.values;
+                        #endif
+                        chars += string_length;
+                        ++chars; /* space for null terminator */
+                        top->u.object.values = (json_object_entry *) chars;
                      }
                      else
                      {

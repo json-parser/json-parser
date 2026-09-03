@@ -64,6 +64,7 @@ jobs:
           c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O3 -DNDEBUG -o json-test-O3
           c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=address   -o json-test-sanitize-address
           c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=undefined -o json-test-sanitize-undefined
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE                     -I.        tests/overflow.c -lm -o json-overflow
 
       - name: Run json-test-O0
         run: |
@@ -94,6 +95,11 @@ jobs:
         run: |
           cd tests
           ../json-test-sanitize-undefined
+
+      - name: Run json-overflow
+        run: |
+          cd tests
+          ../json-overflow
 
       - name: Build with configure script
         run: |
@@ -144,7 +150,15 @@ jobs:
       - name: Build test executable
         run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c /Fetests\json-test.exe
 
+      - name: Build overflow test executable
+        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp tests\overflow.c /Fetests\json-overflow.exe
+
       - name: Run tests
         if: matrix.arch != 'amd64_arm' && matrix.arch != 'amd64_arm64'
         working-directory: ./tests
         run: ./json-test.exe
+
+      - name: Run overflow tests
+        if: matrix.arch != 'amd64_arm' && matrix.arch != 'amd64_arm64'
+        working-directory: ./tests
+        run: ./json-overflow.exe

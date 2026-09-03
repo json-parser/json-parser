@@ -65,6 +65,40 @@
 #define JSON_INT_MAX (json_int_t)(((unsigned json_int_t)(-1)) / (unsigned json_int_t)2);
 #endif
 
+#ifndef JSON_UINTPTR_T
+   #ifdef UINTPTR_MAX
+      /* C99 */
+      #define JSON_UINTPTR_T uintptr_t
+   #else
+      /* C89 */
+      #define JSON_UINTPTR_T size_t
+   #endif
+#endif
+
+#ifndef JSON_SIZE_MAX
+   #ifdef SIZE_MAX
+      /* C99 */
+      #define JSON_SIZE_MAX SIZE_MAX
+   #else
+      /* C89 */
+      #define JSON_SIZE_MAX ((size_t) -1)
+   #endif
+#endif
+
+typedef char json_size_t_static_assert[(JSON_SIZE_MAX >= UINT_MAX) ? 1 : -1]; /* size_t must be able to hold all values of unsigned int */
+#ifndef JSON_OBJECT_ELEMENTS_MAX
+   static const unsigned int JSON_OBJECT_ELEMENTS_MAX = UINT_MAX / (sizeof (json_object_entry) + sizeof (json_char));
+#endif
+#ifndef JSON_ARRAY_ELEMENTS_MAX
+   static const unsigned int JSON_ARRAY_ELEMENTS_MAX  = UINT_MAX / sizeof (json_value *);
+#endif
+#ifndef JSON_STRING_LENGTH_MAX
+   static const unsigned int JSON_STRING_LENGTH_MAX   = UINT_MAX / sizeof (json_char) - (unsigned int) 1;
+#endif
+#ifndef JSON_OBJECT_NAMES_COMBINED_LENGTH_MAX
+   static const unsigned int JSON_OBJECT_NAMES_COMBINED_LENGTH_MAX = UINT_MAX / sizeof (json_char) - (unsigned int) (1 + sizeof (json_object_entry));
+#endif
+
 typedef unsigned int json_uchar;
 
 const struct _json_value json_value_none;
@@ -134,6 +168,7 @@ static int new_value (json_state * state,
 {
    json_value * value;
    size_t values_size;
+   JSON_UINTPTR_T names_size;
 
    if (!state->first_pass)
    {
@@ -150,6 +185,15 @@ static int new_value (json_state * state,
             if (value->u.array.length == 0)
                break;
 
+            #ifndef JSON_NO_PEDANTIC_OVERFLOW
+            /* the first pass should already have handled this */
+            if (value->u.array.length > JSON_ARRAY_ELEMENTS_MAX)
+            {
+               value->u.array.length = 0;
+               return 0;
+            }
+            #endif
+
             if (! (value->u.array.values = (json_value **) json_alloc
                (state, value->u.array.length * sizeof (json_value *), 0)) )
             {
@@ -165,19 +209,38 @@ static int new_value (json_state * state,
             if (value->u.object.length == 0)
                break;
 
-            values_size = sizeof (*value->u.object.values) * value->u.object.length;
+            #ifndef JSON_NO_PEDANTIC_OVERFLOW
+            /* the first pass should already have handled this */
+            if (value->u.object.length > JSON_OBJECT_ELEMENTS_MAX)
+            {
+               value->u.object.length = 0;
+               value->u.object.values = 0;
+               return 0;
+            }
+            #endif
+
+            values_size = sizeof (json_object_entry) * value->u.object.length;
 
             /*
                The `values` pointer holds a size calculated by the first pass.
                The size represents the storage space needed for object key names.
                Now during the second pass, it's replaced with an actual allocation.
             */
+            names_size = (JSON_UINTPTR_T) value->u.object.values;
+
+            #ifndef JSON_NO_PEDANTIC_OVERFLOW
+            /* the first pass should already have handled this */
+            if (names_size > JSON_OBJECT_NAMES_COMBINED_LENGTH_MAX
+            || values_size >= JSON_SIZE_MAX || JSON_SIZE_MAX - values_size < names_size)
+            {
+               value->u.object.length = 0;
+               value->u.object.values = 0;
+               return 0;
+            }
+            #endif
+
             if (! (value->u.object.values = (json_object_entry *) json_alloc
-               #ifdef UINTPTR_MAX
-                  (state, values_size + ((uintptr_t) value->u.object.values), 0)) )
-               #else
-                  (state, values_size + ((size_t) value->u.object.values), 0)) )
-               #endif
+               (state, values_size + names_size, 0)) )
             {
                value->u.object.length = 0;
                return 0;
@@ -189,6 +252,14 @@ static int new_value (json_state * state,
             break;
 
          case json_string:
+
+            #ifndef JSON_NO_PEDANTIC_OVERFLOW
+            /* the first pass should already have handled this */
+            if (value->u.string.length > JSON_STRING_LENGTH_MAX)
+            {
+               return 0;
+            }
+            #endif
 
             if (! (value->u.string.ptr = (json_char *) json_alloc
                (state, (value->u.string.length + 1) * sizeof (json_char), 0)) )
@@ -316,7 +387,7 @@ json_value * json_parse_ex (json_settings * settings,
                goto e_failed;
             }
 
-            if (string_length > UINT_MAX - 8)
+            if (string_length > JSON_STRING_LENGTH_MAX)
                goto e_overflow;
 
             if (flags & flag_escaped)
@@ -374,6 +445,8 @@ json_value * json_parse_ex (json_settings * settings,
 
                     if (uchar <= 0x7FF)
                     {
+                        if (JSON_STRING_LENGTH_MAX - string_length < 2)
+                           goto e_overflow;
                         if (state.first_pass)
                            string_length += 2;
                         else
@@ -385,6 +458,8 @@ json_value * json_parse_ex (json_settings * settings,
                     }
 
                     if (uchar <= 0xFFFF) {
+                        if (JSON_STRING_LENGTH_MAX - string_length < 3)
+                           goto e_overflow;
                         if (state.first_pass)
                            string_length += 3;
                         else
@@ -396,6 +471,8 @@ json_value * json_parse_ex (json_settings * settings,
                         break;
                     }
 
+                    if (JSON_STRING_LENGTH_MAX - string_length < 4)
+                       goto e_overflow;
                     if (state.first_pass)
                        string_length += 4;
                     else
@@ -446,11 +523,11 @@ json_value * json_parse_ex (json_settings * settings,
                         From then on, it's a pointer to allocated memory.
                      */
                      if (state.first_pass) {
-                        #ifdef UINTPTR_MAX
-                           uintptr_t chars = (uintptr_t) top->u.object.values;
-                        #else
-                           size_t chars = (size_t) top->u.object.values;
-                        #endif
+                        JSON_UINTPTR_T chars = (JSON_UINTPTR_T) top->u.object.values;
+
+                        if (chars >= JSON_OBJECT_NAMES_COMBINED_LENGTH_MAX || JSON_OBJECT_NAMES_COMBINED_LENGTH_MAX - chars <= string_length)
+                           goto e_overflow;
+
                         chars += string_length;
                         ++chars; /* space for null terminator */
                         top->u.object.values = (json_object_entry *) chars;
@@ -952,13 +1029,41 @@ json_value * json_parse_ex (json_settings * settings,
 
                      break;
 
-                  default:
+                  default: /* unreachable */
                      break;
                };
             }
 
-            if ( (++ top->parent->u.array.length) > UINT_MAX - 8)
-               goto e_overflow;
+            switch (top->parent->type)
+            {
+               case json_object:
+
+                  if ( (++ top->parent->u.object.length) > JSON_OBJECT_ELEMENTS_MAX)
+                     goto e_overflow;
+
+                  /*
+                     The `values` pointer holds an increasing size during the first pass.
+                     The size represents the storage space needed for object key names.
+                     It's used by `new_value` when transitioning into the second pass.
+                     A single allocation must be able to contain the object entries and names.
+                  */
+                  if (state.first_pass
+                  &&  JSON_SIZE_MAX - top->parent->u.object.length * sizeof (json_object_entry)
+                  < ((JSON_UINTPTR_T) top->parent->u.object.values) )
+                     goto e_overflow;
+
+                  break;
+
+               case json_array:
+
+                  if ( (++ top->parent->u.array.length) > JSON_ARRAY_ELEMENTS_MAX)
+                     goto e_overflow;
+
+                  break;
+
+               default: /* unreachable */
+                  break;
+            }
 
             top = top->parent;
 

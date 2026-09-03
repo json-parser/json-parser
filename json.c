@@ -150,6 +150,25 @@ static int new_value (json_state * state,
             if (value->u.array.length == 0)
                break;
 
+            /*
+               value->u.array.length is bounded by UINT_MAX - 8 (see the
+               overflow check where it's incremented), but on platforms
+               where size_t is only 32 bits wide that's still enough to
+               wrap this multiplication around and hand json_alloc a
+               size far too small for the number of elements we're about
+               to write into it. Copying into a size_t first (rather than
+               comparing value->u.array.length, an unsigned int, directly
+               against a size_t-sized bound) keeps this a real runtime
+               check on every platform instead of one some compilers can
+               prove ahead of time never fires on 64-bit builds.
+            */
+            {
+               size_t array_length = value->u.array.length;
+
+               if (array_length > ((size_t) -1) / sizeof (json_value *))
+                  return 0;
+            }
+
             if (! (value->u.array.values = (json_value **) json_alloc
                (state, value->u.array.length * sizeof (json_value *), 0)) )
             {
@@ -164,6 +183,14 @@ static int new_value (json_state * state,
             if (value->u.object.length == 0)
                break;
 
+            /* same reasoning as the array case above */
+            {
+               size_t object_length = value->u.object.length;
+
+               if (object_length > ((size_t) -1) / sizeof (*value->u.object.values))
+                  return 0;
+            }
+
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
             /*
@@ -171,6 +198,9 @@ static int new_value (json_state * state,
                The size represents the storage space needed for object key names.
                Now during the second pass, it's replaced with an actual allocation.
             */
+            if (values_size > ((size_t) -1) - (size_t) value->u.object.values)
+               return 0;
+
             if (! (value->u.object.values = (json_object_entry *) json_alloc
                #ifdef UINTPTR_MAX
                   (state, values_size + ((uintptr_t) value->u.object.values), 0)) )

@@ -153,6 +153,7 @@ static int new_value (json_state * state,
             if (! (value->u.array.values = (json_value **) json_alloc
                (state, value->u.array.length * sizeof (json_value *), 0)) )
             {
+               value->u.array.length = 0;
                return 0;
             }
 
@@ -178,6 +179,7 @@ static int new_value (json_state * state,
                   (state, values_size + ((size_t) value->u.object.values), 0)) )
                #endif
             {
+               value->u.object.length = 0;
                return 0;
             }
 

@@ -56,11 +56,44 @@ jobs:
         run: |
           c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-example0
 
-      - name: Build and run tests
+      - name: Build tests
         run: |
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -o json-test
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O0          -o json-test-O0
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O1 -DNDEBUG -o json-test-O1
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O2 -DNDEBUG -o json-test-O2
+          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O3 -DNDEBUG -o json-test-O3
+          c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=address   -o json-test-sanitize-address
+          c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=undefined -o json-test-sanitize-undefined
+
+      - name: Run json-test-O0
+        run: |
           cd tests
-          ../json-test
+          ../json-test-O0
+
+      - name: Run json-test-O1
+        run: |
+          cd tests
+          ../json-test-O1
+
+      - name: Run json-test-O2
+        run: |
+          cd tests
+          ../json-test-O2
+
+      - name: Run json-test-O3
+        run: |
+          cd tests
+          ../json-test-O3
+
+      - name: Run json-test-sanitize-address
+        run: |
+          cd tests
+          ../json-test-sanitize-address
+
+      - name: Run json-test-sanitize-undefined
+        run: |
+          cd tests
+          ../json-test-sanitize-undefined
 
       - name: Build with configure script
         run: |

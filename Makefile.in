@@ -58,6 +58,7 @@ install-shared: libjsonparser.$(SO_EXT)
 
 install-static: libjsonparser.a
 	@echo Installing static library: $(libdir)/libjsonparser.a
+	@install -d $(libdir) || true
 	@install -m 0755 libjsonparser.a $(libdir)/libjsonparser.a
 	@install -d $(includedir)/json-parser || true
 	@install -m 0644 $(srcdir)/json.h $(includedir)/json-parser

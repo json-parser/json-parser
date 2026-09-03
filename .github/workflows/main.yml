@@ -105,6 +105,9 @@ jobs:
         run: |
           ./configure
           make
+          make -n install-static
+          make -n install-shared
+          make -n install
 
   build-msvc:
     runs-on: windows-latest

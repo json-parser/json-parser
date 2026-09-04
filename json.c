@@ -417,24 +417,50 @@ json_value * json_parse_ex (json_settings * settings,
                     uc_b2 = (uc_b3 << 4) | uc_b4;
                     uchar = (uc_b1 << 8) | uc_b2;
 
-                    if ((uchar & 0xF800) == 0xD800) {
-                        json_uchar uchar2;
+                    if ((uchar & 0xF800) == 0xD800)
+                    {
+                       json_uchar uchar2;
+                       const char *saved_ptr = state.ptr;
 
-                        if (end - state.ptr <= 6 || (*++ state.ptr) != '\\' || (*++ state.ptr) != 'u' ||
-                            (uc_b1 = hex_value (*++ state.ptr)) == 0xFF ||
-                            (uc_b2 = hex_value (*++ state.ptr)) == 0xFF ||
-                            (uc_b3 = hex_value (*++ state.ptr)) == 0xFF ||
-                            (uc_b4 = hex_value (*++ state.ptr)) == 0xFF)
-                        {
-                            sprintf (error, "%u:%u: Invalid character value `%c`", line_and_col, b);
-                            goto e_failed;
-                        }
+                       /* Only try pairing if this is a HIGH surrogate */
+                       if ((uchar & 0xFC00) == 0xD800)
+                       {
+                          /* Try to read second half */
+                          if ((end - state.ptr > 6) &&
+                             (*++state.ptr == '\\') &&
+                             (*++state.ptr == 'u') &&
+                             (uc_b1 = hex_value(*++state.ptr)) != 0xFF &&
+                             (uc_b2 = hex_value(*++state.ptr)) != 0xFF &&
+                             (uc_b3 = hex_value(*++state.ptr)) != 0xFF &&
+                             (uc_b4 = hex_value(*++state.ptr)) != 0xFF)
+                          {
+                             uc_b1 = (uc_b1 << 4) | uc_b2;
+                             uc_b2 = (uc_b3 << 4) | uc_b4;
+                             uchar2 = (uc_b1 << 8) | uc_b2;
 
-                        uc_b1 = (uc_b1 << 4) | uc_b2;
-                        uc_b2 = (uc_b3 << 4) | uc_b4;
-                        uchar2 = (uc_b1 << 8) | uc_b2;
+                             /* Valid surrogate pair? */
+                             if ((uchar2 & 0xFC00) == 0xDC00)
+                             {
+                                uchar = 0x010000 +
+                                   (((uchar  - 0xD800) << 10) |
+                                     (uchar2 - 0xDC00));
+                             }
+                             else
+                             {
+                                /* Not a low surrogate → rollback and keep uchar as-is */
+                                state.ptr = saved_ptr;
+                             }
+                          }
+                          else
+                          {
+                             /* Incomplete second part → rollback and keep uchar as-is */
+                             state.ptr = saved_ptr;
+                          }
+                       }
 
-                        uchar = 0x010000 | ((uchar & 0x3FF) << 10) | (uchar2 & 0x3FF);
+                       /* If it's a low surrogate or unpaired high surrogate, we just
+                        * let it continue normally, and it'll be UTF-8 encoded below
+                        */
                     }
 
                     if (sizeof (json_char) >= sizeof (json_uchar) || (uchar <= 0x7F))

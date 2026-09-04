@@ -1,0 +1,14 @@
+{
+  "valid surrogate pair (😀 U+1F600)": "\uD83D\uDE00",
+  "lone high surrogate": "\uD800",
+  "lone low surrogate": "\uDC00",
+  "high surrogate not followed by low surrogate": "\uD834\u0061",
+  "low surrogate not preceded by high surrogate": "\u0061\uDD1E",
+  "reversed surrogate order (low then high)": "\uDC00\uD800",
+  "two high surrogates in a row": "\uD800\uD801",
+  "two low surrogates in a row": "\uDC00\uDC01",
+  "surrogate pair split by space": "\uD83D\u0020\uDE00",
+  "surrogate halves separated by text": "\uD83Dtest\uDE00",
+  "high surrogate followed by another escape": "\uD83D\u000A",
+  "high surrogate at end of string": "ABC\uD800"
+}

@@ -83,6 +83,35 @@ The `user_data` pointer will be forwarded from `json_settings` to allow applicat
 context to be passed.
 
 
+Changes in version 1.1.1
+------------------------
+
+* Always use size_t for memory size
+
+* Use C89 constants such as ULONG_MAX instead of calculating them
+
+* Fix Coverity Scan defects (assignment of overlapping memory)
+
+* Consistent error messages
+
+* Fix read overflow
+
+* Minimize included header files, reorder header file inclusion
+
+* Fix buffer overrun in truncated Nnicode escape sequences
+
+* Fix autotools build issues
+
+* Fix compiler warnings
+
+* Fix typos and remove trailing spaces
+
+* Handle interger overflow
+
+* Add tests
+
+* Prevent zero-byte allocations
+
 Changes in version 1.1.0
 ------------------------
 

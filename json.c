@@ -339,7 +339,6 @@ json_value * json_parse_ex (json_settings * settings,
    const json_char * end;
    json_value * top, * root, * alloc = 0;
    json_state state = { 0 };
-   long flags = 0;
    int num_digits = 0;
    double num_e = 0, num_fraction = 0;
 
@@ -370,9 +369,9 @@ json_value * json_parse_ex (json_settings * settings,
       unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
       json_char * string = 0;
       unsigned int string_length = 0;
+      long flags = flag_seek_value;
 
       top = root = 0;
-      flags = flag_seek_value;
 
       state.cur_line = 1;
 

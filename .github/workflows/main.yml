@@ -1,15 +1,14 @@
 name: CI
 on:
   push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
-  # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build-gcc:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
 
@@ -111,6 +110,8 @@ jobs:
 
   build-msvc:
     runs-on: windows-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         arch:

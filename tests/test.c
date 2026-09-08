@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -124,21 +124,29 @@ static void * noisy_alloc(size_t count, int zero, void * user_data)
    (void)user_data; /* silence unused param warning */
    if(zero)
    {
-      fprintf(stderr, "calloc %lu bytes: ", (unsigned long)count);
+      fprintf(stderr, "calloc %lu bytes", (unsigned long)count);
       ret = calloc(count, 1);
    }
    else
    {
-      fprintf(stderr, "malloc %lu bytes: ", (unsigned long)count);
+      fprintf(stderr, "malloc %lu bytes", (unsigned long)count);
       ret = malloc(count);
    }
-   fprintf(stderr, "%p\n", ret);
+   #ifdef JSON_TEST_NOISY
+      fprintf(stderr, ": %p\n", ret);
+   #else
+      fprintf(stderr, "\n");
+   #endif
    return ret;
 }
 static void noisy_free(void * ptr, void * user_data)
 {
    (void)user_data; /* silence unused param warning */
-   fprintf(stderr, "free %p\n", ptr);
+   #ifdef JSON_TEST_NOISY
+      fprintf(stderr, "free %p\n", ptr);
+   #else
+      fprintf(stderr, "free\n");
+   #endif
    free(ptr);
 }
 
@@ -162,7 +170,9 @@ static void * arena_alloc(size_t count, int zero, void * user_data)
    count += sizeof(count_original);
    if(arena->next >= arena->size || count > arena->size - arena->next)
    {
-      fprintf(stderr, "arena exhausted, size = %lu, next = %lu, count = %lu\n", (unsigned long)arena->size, (unsigned long)arena->next, (unsigned long)count);
+      #ifdef JSON_TEST_NOISY
+         fprintf(stderr, "arena exhausted, size = %lu, next = %lu, count = %lu\n", (unsigned long)arena->size, (unsigned long)arena->next, (unsigned long)count);
+      #endif
       return NULL;
    }
    ret = (char *)arena->start + arena->next;
@@ -223,7 +233,9 @@ static int json_verify(const char * filename_format, unsigned highest_file_num, 
    int filename_buffer_result;
    json_settings settings = {0};
    char error_buffer[json_error_max];
+   #ifndef JSON_TEST_NO_ALLOC_LIMIT_FUZZ
    struct arena_user_data arena = {large_arena};
+   #endif
    struct file_content_result file_content = {NULL, -1, json_test_error};
 
    if(extensions == 1)
@@ -259,6 +271,7 @@ static int json_verify(const char * filename_format, unsigned highest_file_num, 
             continue;
          }
       }
+      #ifndef JSON_TEST_NO_ALLOC_LIMIT_FUZZ
       /* fuzz various max_memory values in the full arena size */
       arena.size = sizeof(large_arena)/sizeof(char);
       arena.sentinel = 123;
@@ -284,6 +297,7 @@ static int json_verify(const char * filename_format, unsigned highest_file_num, 
             break;
          }
       }
+      #endif
       /* do the normal test */
       settings.max_memory = 0;
       settings.mem_alloc = noisy_alloc;
@@ -360,8 +374,8 @@ int main(void)
    JSON_COMPARE_STRING(0, "abc \\u0000 123", "abc \0 123");
    JSON_COMPARE_STRING(0, "\\ud841\\udf31", "𠜱");
 
-   if(0 != json_verify(      "valid-%04u.json", 13, 0, 0)){ exit_code = EXIT_FAILURE; }
-   if(0 != json_verify(    "invalid-%04u.json", 10, 0, 1)){ exit_code = EXIT_FAILURE; }
+   if(0 != json_verify(      "valid-%04u.json", 16, 0, 0)){ exit_code = EXIT_FAILURE; }
+   if(0 != json_verify(    "invalid-%04u.json", 11, 0, 1)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify(  "ext-valid-%04u.json",  3, 1, 0)){ exit_code = EXIT_FAILURE; }
    if(0 != json_verify("ext-invalid-%04u.json",  2, 1, 1)){ exit_code = EXIT_FAILURE; }
 

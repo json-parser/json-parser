@@ -5,164 +5,200 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-gcc:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Build json.c as C89 without JSON_TRACK_SOURCE
-        run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -shared json.c -lm -o json-c89-notrack
-
-      - name: Build json.c as C89
-        run: c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c89
-
-      - name: Build json.c as C99
-        run: gcc -std=c99 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c99
-
-      - name: Build json.c as C11
-        run: gcc -std=c11 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c11
-
-      - name: Build json.c as C17
-        run: gcc -std=c17 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c17
-
-      - name: Build json.c as C17 with unused parameters as errors
-        run: gcc -std=c17 -Wall -Wpedantic -Werror -Werror=unused-parameter -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c17-unused
-
-      - name: Build json.c as C2x
-        run: gcc -std=c2x -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared json.c -lm -o json-c2x
-
-      - name: Build json.c as C++98
-        run: g++ -std=c++98 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp98
-
-      - name: Build json.c as C++11
-        run: g++ -std=c++11 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp11
-
-      - name: Build json.c as C++14
-        run: g++ -std=c++14 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp14
-
-      - name: Build json.c as C++17
-        run: g++ -std=c++17 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp17
-
-      - name: Build json.c as C++20
-        run: g++ -std=c++20 -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp20
-
-      - name: Build json.c as C++2b
-        run: g++ -std=c++2b -Wall -Wpedantic -Werror -pedantic -pedantic-errors -DJSON_TRACK_SOURCE -shared -fPIC -x c++ json.c -lm -o json-cpp2b
-
-      - name: Build examples
-        run: |
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-example0
-
-      - name: Build tests
-        run: |
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O0          -o json-test-O0
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O1 -DNDEBUG -o json-test-O1
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O2 -DNDEBUG -o json-test-O2
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O3 -DNDEBUG -o json-test-O3
-          c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=address   -o json-test-sanitize-address
-          c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=undefined -o json-test-sanitize-undefined
-          c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE                     -I.        tests/overflow.c -lm -o json-overflow
-
-      - name: Run json-test-O0
-        run: |
-          cd tests
-          ../json-test-O0
-
-      - name: Run json-test-O1
-        run: |
-          cd tests
-          ../json-test-O1
-
-      - name: Run json-test-O2
-        run: |
-          cd tests
-          ../json-test-O2
-
-      - name: Run json-test-O3
-        run: |
-          cd tests
-          ../json-test-O3
-
-      - name: Run json-test-sanitize-address
-        run: |
-          cd tests
-          ../json-test-sanitize-address
-
-      - name: Run json-test-sanitize-undefined
-        run: |
-          cd tests
-          ../json-test-sanitize-undefined
-
-      - name: Run json-overflow
-        run: |
-          cd tests
-          ../json-overflow
-
-      - name: Build with configure script
-        run: |
-          ./configure
-          make
-          make -n install-static
-          make -n install-shared
-          make -n install
-
-  build-msvc:
-    runs-on: windows-latest
+  linux:
     permissions:
       contents: read
     strategy:
       matrix:
-        arch:
-          - amd64_x86
-          - amd64
-#          - amd64_arm # disabled because newer ARM processors and Windows 11 24H2 both removed ARM32 support
-          - amd64_arm64
+        os:
+          - ubuntu-latest
+          - ubuntu-26.04-arm
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE                     -shared                        json.c -lm -o json-gcc-c89-notrack
+      - run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-c89
+        if: (!contains(matrix.os, 'mac'))
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE                     -shared                        json.c -lm -o json-clang-c89-notrack
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-c89
+      - run: gcc     -std=c99       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                                    -shared                        json.c -lm -o json-gcc-c99
+      - run: clang   -std=c99       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                                    -shared                        json.c -lm -o json-clang-c99
+      - run: gcc     -std=c99       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-c99
+      - run: clang   -std=c99       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-c99
+      - run: gcc     -std=gnu99     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-gnu99
+      - run: clang   -std=gnu99     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-gnu99
+      - run: gcc     -std=c11       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-c11
+      - run: clang   -std=c11       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-c11
+      - run: gcc     -std=c17       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-c17
+      - run: clang   -std=c17       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-c17
+      - run: gcc     -std=c17       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-c17-unused   -Werror=unused-parameter
+      - run: clang   -std=c17       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-c17-unused -Werror=unused-parameter
+      - run: gcc     -std=c2x       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-c23
+      - run: clang   -std=c23       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-c23
+      - run: gcc     -std=gnu2x     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-gcc-gnu23
+      - run: clang   -std=gnu23     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared                        json.c -lm -o json-clang-gnu23
+      - run: g++     -std=c++98     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp98         -Wno-deprecated-declarations
+      - run: clang++ -std=c++98     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp98       -Wno-deprecated-declarations
+      - run: g++     -std=c++11     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp11         -Wno-deprecated-declarations
+      - run: clang++ -std=c++11     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp11       -Wno-deprecated-declarations
+      - run: g++     -std=c++14     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp14         -Wno-deprecated-declarations
+      - run: clang++ -std=c++14     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp14       -Wno-deprecated-declarations
+      - run: g++     -std=c++17     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp17         -Wno-deprecated-declarations
+      - run: clang++ -std=c++17     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp17       -Wno-deprecated-declarations
+      - run: g++     -std=c++20     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp20         -Wno-deprecated-declarations
+      - run: clang++ -std=c++20     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp20       -Wno-deprecated-declarations
+      - run: g++     -std=c++23     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp23         -Wno-deprecated-declarations
+      - run: clang++ -std=c++23     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp23       -Wno-deprecated-declarations
+      - run: g++     -std=c++2b     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-cpp26         -Wno-deprecated-declarations
+      - run: clang++ -std=c++26     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp26       -Wno-deprecated-declarations
+      - run: g++     -std=gnu++2b   -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-gcc-gnupp26       -Wno-deprecated-declarations
+      - run: clang++ -std=gnu++26   -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-gnupp26     -Wno-deprecated-declarations
+      - run: clang++ -std=c++2c     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x           c++ json.c -lm -o json-clang-cpp2c       -Wno-deprecated-declarations
+      - run: clang   -std=c23       -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared       -x objective-c   json.c -lm -o json-clang-objc23      -Wno-deprecated-declarations
+      - run: clang   -std=gnu23     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared       -x objective-c   json.c -lm -o json-clang-objgnu23    -Wno-deprecated-declarations
+      - run: clang++ -std=c++26     -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x objective-c++ json.c -lm -o json-clang-objcpp26    -Wno-deprecated-declarations
+      - run: clang++ -std=gnu++26   -Wall -Wpedantic -Werror -pedantic -pedantic-errors                -DJSON_TRACK_SOURCE -shared -fPIC -x objective-c++ json.c -lm -o json-clang-objgnupp26  -Wno-deprecated-declarations
+
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-gcc-example0
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c examples/test_json.c -lm -o json-clang-example0
+
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O0          -o json-gcc-test-O0
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O0          -o json-clang-test-O0
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O1 -DNDEBUG -o json-gcc-test-O1
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O1 -DNDEBUG -o json-clang-test-O1
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O2 -DNDEBUG -o json-gcc-test-O2
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O2 -DNDEBUG -o json-clang-test-O2
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O3 -DNDEBUG -o json-gcc-test-O3
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm    -O3 -DNDEBUG -o json-clang-test-O3
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=address   -o json-gcc-test-sanitize-address
+      - run: clang   -std=c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=address   -o json-clang-test-sanitize-address
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=undefined -o json-gcc-test-sanitize-undefined
+      - run: clang   -std=c89 -ansi                                                     -D_ANSI_SOURCE -DJSON_TRACK_SOURCE -I. json.c tests/test.c -lm -g -O0 -fno-omit-frame-pointer -fsanitize=undefined -o json-clang-test-sanitize-undefined
+      - if: (!contains(matrix.os, 'mac'))
+        run:              c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE                     -I.        tests/overflow.c -lm -o json-gcc-overflow
+      - run: clang   -std=c89 -ansi -Wall -Wpedantic -Werror -pedantic -pedantic-errors -D_ANSI_SOURCE                     -I.        tests/overflow.c -lm -o json-clang-overflow
+
+      - {"working-directory": "./tests", "run": "../json-gcc-test-O0"                , "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-test-O0"}
+      - {"working-directory": "./tests", "run": "../json-gcc-test-O1"                , "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-test-O1"}
+      - {"working-directory": "./tests", "run": "../json-gcc-test-O2"                , "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-test-O2"}
+      - {"working-directory": "./tests", "run": "../json-gcc-test-O3"                , "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-test-O3"}
+      - {"working-directory": "./tests", "run": "../json-gcc-test-sanitize-address"  , "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-test-sanitize-address"}
+      - {"working-directory": "./tests", "run": "../json-gcc-test-sanitize-undefined", "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-test-sanitize-undefined"}
+      - {"working-directory": "./tests", "run": "../json-gcc-overflow"               , "if": "!contains(matrix.os, 'mac')"}
+      - {"working-directory": "./tests", "run": "../json-clang-overflow"}
+
+      - run: ./configure
+      - run: make
+      - run: make -n install-static
+      - run: make -n install-shared
+      - run: make -n install
+
+  windows:
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        hostarch:
+          - x64
+          - arm64
+        targarch:
+          - x86
+          - x64
+#         - arm # disabled because newer ARM processors and Windows 11 24H2 both removed ARM32 support
+          - arm64
+        include:
+          - hostarch: x86 #TODO only used for the x86 asan run due to the DLL situation described below
+            targarch: x86
+    runs-on: ${{ case(matrix.hostarch == 'arm64', 'windows-11-vs2026-arm', 'windows-latest') }}
     steps:
       - uses: actions/checkout@v6
 
       - name: Add cl.exe to path
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.arch }}
+          arch: ${{ case(matrix.hostarch == matrix.targarch, matrix.hostarch, format('{0}_{1}', matrix.hostarch, matrix.targarch)) }}
 
-      - name: Build json.c as MS C89 without JSON_TRACK_SOURCE
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /LD json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za                            /Wall                     /LD     json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /Za                            /Wall                     /LD     json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za                            /Wall /DJSON_TRACK_SOURCE /LD     json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /Za                            /Wall /DJSON_TRACK_SOURCE /LD     json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c11                       /Wall /DJSON_TRACK_SOURCE /LD     json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /std:c11                       /Wall /DJSON_TRACK_SOURCE /LD     json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c17                       /Wall /DJSON_TRACK_SOURCE /LD     json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /std:c17                       /Wall /DJSON_TRACK_SOURCE /LD     json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++14     /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /std:c++14     /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++17     /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /std:c++17     /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++20     /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /std:c++20     /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
+      - run: clang-cl /permissive- /c                               /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
 
-      - name: Build json.c as MS C89
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /Za /Wall /DJSON_TRACK_SOURCE /LD json.c
+      - name: Build ARM64X DLL
+        if: matrix.targarch == 'arm64'
+        run: |
+          cl /c       /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8                                      /DJSON_TRACK_SOURCE         json.c /Fojson-arm64.obj
+          cl /c       /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8                                      /DJSON_TRACK_SOURCE         json.c /Fojson-arm64ec.obj /arm64EC
+          link /DLL /MACHINE:ARM64X json-arm64ec.obj json-arm64.obj /out:json-arm64x.dll
 
-      - name: Build json.c as C11
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c11 /Wall /DJSON_TRACK_SOURCE /LD json.c
+      - if: matrix.targarch == 'arm64'
+        run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c     /Fetests\json-test-arm64ec.exe /arm64EC
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c     /Fetests\json-test.exe
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c     /Fetests\json-test-asan.exe /fsanitize=address
+      - run: clang-cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c     /Fetests\json-test-clangcl.exe
+        if: matrix.hostarch == matrix.targarch && matrix.hostarch != 'x64' && matrix.hostarch != 'x86'
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT            /Tp tests\overflow.c /Fetests\json-overflow.exe
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT            /Tp tests\overflow.c /Fetests\json-overflow-asan.exe /fsanitize=address
+      - run:       cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT            /Tp tests\overflow.c /Fetests\json-overflow-arm64ec.exe /arm64EC
+        if: matrix.targarch == 'arm64'
+      - run: clang-cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT            /Tp tests\overflow.c /Fetests\json-overflow-clangcl.exe
+        if: matrix.hostarch == matrix.targarch && matrix.hostarch != 'x64' && matrix.hostarch != 'x86'
 
-      - name: Build json.c as C17
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c17 /Wall /DJSON_TRACK_SOURCE /LD json.c
-
-      - name: Build json.c as C++14
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++14 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
-
-      - name: Build json.c as C++17
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++17 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
-
-      - name: Build json.c as C++20
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++20 /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
-
-      - name: Build json.c as C++ latest
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /LD /Tp json.c
-
-      - name: Build test executable
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp json.c /Tp tests\test.c /Fetests\json-test.exe
-
-      - name: Build overflow test executable
-        run: cl /permissive- /Zc:preprocessor /Zc:throwingNew /volatile:iso /utf-8 /std:c++latest /Zc:__cplusplus /Wall /DJSON_TRACK_SOURCE /I . /MT /Tp tests\overflow.c /Fetests\json-overflow.exe
-
-      - name: Run tests
-        if: matrix.arch != 'amd64_arm' && matrix.arch != 'amd64_arm64'
+      - if: matrix.hostarch == 'arm64' || !contains(matrix.targarch, 'arm')
         working-directory: ./tests
         run: ./json-test.exe
 
-      - name: Run overflow tests
-        if: matrix.arch != 'amd64_arm' && matrix.arch != 'amd64_arm64'
+      - if: matrix.hostarch == 'arm64' || !contains(matrix.targarch, 'arm')
         working-directory: ./tests
         run: ./json-overflow.exe
+
+      - if: (matrix.hostarch == 'arm64' || !contains(matrix.targarch, 'arm')) && matrix.hostarch == matrix.targarch && matrix.hostarch != 'x64' && matrix.hostarch != 'x86'
+        working-directory: ./tests
+        run: ./json-test-clangcl.exe
+
+      - if: (matrix.hostarch == 'arm64' || !contains(matrix.targarch, 'arm')) && matrix.hostarch == matrix.targarch && matrix.hostarch != 'x64' && matrix.hostarch != 'x86'
+        working-directory: ./tests
+        run: ./json-overflow-clangcl.exe
+
+      - if: (matrix.hostarch == 'arm64' || !contains(matrix.targarch, 'arm')) && matrix.hostarch == matrix.targarch #TODO need proper handling of asan DLLs for mismatched host+targ https://devblogs.microsoft.com/cppblog/msvc-address-sanitizer-one-dll-for-all-runtime-configurations/#troubleshooting
+        working-directory: ./tests
+        run: ./json-test-asan.exe
+
+      - if: (matrix.hostarch == 'arm64' || !contains(matrix.targarch, 'arm')) && matrix.hostarch == matrix.targarch #TODO
+        working-directory: ./tests
+        run: ./json-overflow-asan.exe
+
+      - if: matrix.hostarch == 'arm64' && matrix.targarch == 'arm64'
+        working-directory: ./tests
+        run: ./json-test-arm64ec.exe
+
+      - if: matrix.hostarch == 'arm64' && matrix.targarch == 'arm64'
+        working-directory: ./tests
+        run: ./json-overflow-arm64ec.exe
